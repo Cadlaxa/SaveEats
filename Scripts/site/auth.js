@@ -1,3 +1,18 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
 document.addEventListener("DOMContentLoaded", () => {
   const loginForm = document.getElementById("loginForm");
   const signUpForm = document.getElementById("SignUpForm");
@@ -15,16 +30,50 @@ document.addEventListener("DOMContentLoaded", () => {
     apiKey: "AIzaSyAZKYQvVJihtvRz7QHrXHNullNNadyQVMc",
     authDomain: "saveeats-395fd.firebaseapp.com",
     projectId: "saveeats-395fd",
-    storageBucket: "saveeats-395fd.firebasestorage.app",
+    storageBucket: "saveeats-395fd.appspot.com",
     messagingSenderId: "1070958395954",
     appId: "1:1070958395954:web:41c17d243770545c58f22b",
     measurementId: "G-6QZMSPQEM9"
   };
 
-  // Initialize Firebase (compat)
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // ---------------------------
+  // MODALS
+  // ---------------------------
+  function showError(message) {
+    errorMessageBox.textContent = message;
+    errorModal?.classList.add("visible");
+    navigator.vibrate?.([50, 150, 50]);
+  }
+
+  closeButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      btn.closest(".modal-container")?.classList.remove("visible");
+    });
+  });
+
+  window.addEventListener("click", (e) => {
+    if (e.target === submitModal || e.target === errorModal) {
+      e.target.classList.remove("visible");
+    }
+  });
+
+  function showSubmitModalAndRedirect(userType) {
+    submitModal?.classList.add("visible");
+    navigator.vibrate?.([50, 150, 50]);
+
+    setTimeout(() => {
+      if (userType === "restaurant") {
+        window.location.href = "restaurant_home.html";
+      } else {
+        window.location.href = "home-user.html";
+      }
+    }, 1000);
+  }
 
   // ---------------------------
   // LOGIN
@@ -35,24 +84,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const password = document.getElementById("login-password").value;
 
     try {
-      const userCredential = await auth.signInWithEmailAndPassword(email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      const docSnap = await db.collection("users").doc(user.uid).get();
-      if (!docSnap.exists) throw new Error("User data not found.");
+      const docSnap = await getDoc(doc(db, "users", user.uid));
+      if (!docSnap.exists()) throw new Error("User data not found.");
 
       const userType = docSnap.data().type || "user";
-
-      submitModal?.classList.add("visible");
-      navigator.vibrate?.([50, 150, 50]);
-
-      setTimeout(() => {
-        if (userType === "restaurant") {
-          window.location.href = "restaurant_home.html";
-        } else {
-          window.location.href = "user_home.html";
-        }
-      }, 1000);
+      showSubmitModalAndRedirect(userType);
 
       loginForm.reset();
     } catch (error) {
@@ -64,25 +103,15 @@ document.addEventListener("DOMContentLoaded", () => {
   // GOOGLE LOGIN
   // ---------------------------
   googleLoginBtn?.addEventListener("click", async () => {
-    const provider = new firebase.auth.GoogleAuthProvider();
+    const provider = new GoogleAuthProvider();
     try {
-      const result = await auth.signInWithPopup(provider);
+      const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      // Check Firestore for account type
-      const docSnap = await db.collection("users").doc(user.uid).get();
+      const docSnap = await getDoc(doc(db, "users", user.uid));
       const userType = docSnap.exists ? docSnap.data().type || "user" : "user";
 
-      submitModal?.classList.add("visible");
-      navigator.vibrate?.([50, 150, 50]);
-
-      setTimeout(() => {
-        if (userType === "restaurant") {
-          window.location.href = "restaurant_home.html";
-        } else {
-          window.location.href = "user_home.html";
-        }
-      }, 1000);
+      showSubmitModalAndRedirect(userType);
     } catch (error) {
       showError(error.message);
     }
@@ -110,42 +139,23 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      await db.collection("users").doc(user.uid).set({
+      await setDoc(doc(db, "users", user.uid), {
         username: username,
         email: email,
         type: accountType,
         createdAt: new Date()
       });
 
-      submitModal?.classList.add("visible");
-      signUpForm.reset();
+      const redirectType = accountType;
       accountType = "user";
+      signUpForm.reset();
+
+      showSubmitModalAndRedirect(redirectType);
     } catch (error) {
       showError(error.message);
-    }
-  });
-
-  // ---------------------------
-  // MODALS
-  // ---------------------------
-  function showError(message) {
-    errorMessageBox.textContent = message;
-    errorModal?.classList.add("visible");
-    navigator.vibrate?.([50, 150, 50]);
-  }
-
-  closeButtons.forEach(btn => {
-    btn.addEventListener("click", () => {
-      btn.closest(".modal-container").classList.remove("visible");
-    });
-  });
-
-  window.addEventListener("click", (e) => {
-    if (e.target === submitModal || e.target === errorModal) {
-      e.target.classList.remove("visible");
     }
   });
 });
