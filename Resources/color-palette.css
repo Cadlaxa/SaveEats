@@ -1,0 +1,184 @@
+/* Palette button */
+button.palette-btn {
+    position: fixed;
+    bottom: 120px;
+    left: 10px;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: var(--orange);
+    color: white;
+    font-size: 22px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 2000;
+    transition: all 0.2s ease-in-out;
+    display: inline-block;
+}
+
+button.palette-btn:hover {
+    background-color: var(--orangeD, #fa8b4b);
+    transform: translateY(-5px);
+}
+
+button.palette-btn:active {
+    transform: var(--clicky);
+}
+
+@keyframes waveBrush {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    20% {
+        transform: rotate(-30deg);
+    }
+
+    40% {
+        transform: rotate(25deg);
+    }
+
+    60% {
+        transform: rotate(-20deg);
+    }
+
+    80% {
+        transform: rotate(8deg);
+    }
+
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
+button.palette-btn i.switching {
+    animation: waveBrush 0.8s ease-in-out;
+    transform-origin: bottom center;
+    /* pivot like a paintbrush */
+}
+
+/* Palette options container */
+.palette-options {
+    position: fixed;
+    bottom: 15px;
+    left: 70px;
+    transform: translateY(150%);
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    opacity: 1;
+    pointer-events: none;
+    z-index: 2000;
+    transition: all 0.3s ease;
+}
+
+.palette-options.show {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0%);
+}
+
+.palette {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s ease;
+}
+
+.palette:hover {
+    transform: scale(1.2) rotate(360deg);
+}
+
+.palette:active {
+    transform: var(--clicky);
+}
+
+.palette[data-palette="orange"] {
+    background: #ffa600;
+}
+
+.palette[data-palette="blue"] {
+    background: #3b82f6;
+}
+
+.palette[data-palette="green"] {
+    background: #10b981;
+}
+
+.palette[data-palette="pink"] {
+    background: #ec4899;
+}
+
+.palette[data-palette="purple"] {
+    background: #8b5cf6;
+}
+
+.palette[data-palette="red"] {
+    background: #fc5656;
+}
+
+.palette[data-palette="hue-shift"] {
+    background-image: url('https://upload.wikimedia.org/wikipedia/commons/7/7e/OS_X_10.11_Beta_Beach_Ball.jpg');
+    background-size: 150%;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-attachment: fixed;
+}
+
+.hue-shift-control {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 10px 0;
+}
+
+#hue-slider {
+    -webkit-appearance: none;
+    width: 180px;
+    height: 15px;
+    border-radius: 10px;
+    background: linear-gradient(
+        to right,
+        hsl(0, 70%, 50%), 
+        hsl(60, 70%, 50%),
+        hsl(120, 70%, 50%),
+        hsl(180, 70%, 50%),
+        hsl(240, 70%, 50%),
+        hsl(300, 70%, 50%),
+        hsl(360, 70%, 50%)
+    );
+    cursor: pointer;
+    outline: none;
+    border: 1px solid var(--light-gray);
+}
+#hue-slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 8px;
+    height: 25px;
+    border-radius: 20%;
+    background: #fff;
+    cursor: grab;
+}
+
+
+@media (max-width: 600px) {
+    .palette-options {
+        position: fixed;
+        bottom: 15px;
+        left: 18%;
+        transform: translateY(150%);
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        opacity: 1;
+        pointer-events: none;
+        z-index: 2000;
+        transition: all 0.3s ease;
+    }
+    #hue-slider {
+        display: none;
+    }
+}
