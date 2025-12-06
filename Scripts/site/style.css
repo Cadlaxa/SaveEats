@@ -503,8 +503,8 @@ body {
   position: absolute;
   inset: 0;
   background-color: var(--orange);
-  mask: url('resources/svg/icon_about.svg') no-repeat center / contain;
-  -webkit-mask: url('resources/svg/icon_about.svg') no-repeat center / contain;
+  mask: url('/Resources/svg/icon_about.svg') no-repeat center / contain;
+  -webkit-mask: url('/Resources/svg/icon_about.svg') no-repeat center / contain;
   transition: background-color 0.2s ease;
 }
 .icon-about::after {
@@ -512,8 +512,8 @@ body {
   position: absolute;
   inset: 0;
   background-color: var(--dark-orange);
-  mask: url('resources/svg/icon_about_l.svg') no-repeat center / contain;
-  -webkit-mask: url('resources/svg/icon_about_l.svg') no-repeat center / contain;
+  mask: url('/Resources/svg/icon_about_l.svg') no-repeat center / contain;
+  -webkit-mask: url('/Resources/svg/icon_about_l.svg') no-repeat center / contain;
   transition: background-color 0.2s ease;
 }
 
@@ -522,8 +522,8 @@ body {
   position: absolute;
   inset: 0;
   background-color: var(--orange);
-  mask: url('resources/svg/icon_links.svg') no-repeat center / contain;
-  -webkit-mask: url('resources/svg/icon_links.svg') no-repeat center / contain;
+  mask: url('/Resources/svg/icon_links.svg') no-repeat center / contain;
+  -webkit-mask: url('/Resources/svg/icon_links.svg') no-repeat center / contain;
   transition: background-color 0.2s ease;
 }
 .icon-links::after {
@@ -531,8 +531,8 @@ body {
   position: absolute;
   inset: 0;
   background-color: var(--dark-orange);
-  mask: url('resources/svg/icon_links_l.svg') no-repeat center / contain;
-  -webkit-mask: url('resources/svg/icon_links_l.svg') no-repeat center / contain;
+  mask: url('/Resources/svg/icon_links_l.svg') no-repeat center / contain;
+  -webkit-mask: url('/Resources/svg/icon_links_l.svg') no-repeat center / contain;
   transition: background-color 0.2s ease;
 }
 
@@ -541,8 +541,8 @@ body {
   position: absolute;
   inset: 0;
   background-color: var(--orange);
-  mask: url('resources/svg/icon_projects.svg') no-repeat center / contain;
-  -webkit-mask: url('resources/svg/icon_projects.svg') no-repeat center / contain;
+  mask: url('/Resources/svg/icon_projects.svg') no-repeat center / contain;
+  -webkit-mask: url('/Resources/svg/icon_projects.svg') no-repeat center / contain;
   transition: background-color 0.2s ease;
 }
 .icon-projects::after {
@@ -550,8 +550,8 @@ body {
   position: absolute;
   inset: 0;
   background-color: var(--dark-orange);
-  mask: url('resources/svg/icon_projects_l.svg') no-repeat center / contain;
-  -webkit-mask: url('resources/svg/icon_projects_l.svg') no-repeat center / contain;
+  mask: url('/Resources/svg/icon_projects_l.svg') no-repeat center / contain;
+  -webkit-mask: url('/Resources/svg/icon_projects_l.svg') no-repeat center / contain;
   transition: background-color 0.2s ease;
 }
 
@@ -560,8 +560,8 @@ body {
   position: absolute;
   inset: 0;
   background-color: var(--orange);
-  mask: url('resources/svg/icon_faq.svg') no-repeat center / contain;
-  -webkit-mask: url('resources/svg/icon_faq.svg') no-repeat center / contain;
+  mask: url('/Resources/svg/icon_faq.svg') no-repeat center / contain;
+  -webkit-mask: url('/Resources/svg/icon_faq.svg') no-repeat center / contain;
   transition: background-color 0.2s ease;
 }
 .icon-faq::after {
@@ -569,8 +569,8 @@ body {
   position: absolute;
   inset: 0;
   background-color: var(--dark-orange);
-  mask: url('resources/svg/icon_faq_l.svg') no-repeat center / contain;
-  -webkit-mask: url('resources/svg/icon_faq_l.svg') no-repeat center / contain;
+  mask: url('/Resources/svg/icon_faq_l.svg') no-repeat center / contain;
+  -webkit-mask: url('/Resources/svg/icon_faq_l.svg') no-repeat center / contain;
   transition: background-color 0.2s ease;
 }
 
@@ -579,8 +579,8 @@ body {
   position: absolute;
   inset: 0;
   background-color: var(--orange);
-  mask: url('resources/svg/icon_contacts.svg') no-repeat center / contain;
-  -webkit-mask: url('resources/svg/icon_contacts.svg') no-repeat center / contain;
+  mask: url('/Resources/svg/icon_contacts.svg') no-repeat center / contain;
+  -webkit-mask: url('/Resources/svg/icon_contacts.svg') no-repeat center / contain;
   transition: background-color 0.2s ease;
 }
 .icon-contacts::after {
@@ -588,8 +588,8 @@ body {
   position: absolute;
   inset: 0;
   background-color: var(--dark-orange);
-  mask: url('resources/svg/icon_contacts_l.svg') no-repeat center / contain;
-  -webkit-mask: url('resources/svg/icon_contacts_l.svg') no-repeat center / contain;
+  mask: url('/Resources/svg/icon_contacts_l.svg') no-repeat center / contain;
+  -webkit-mask: url('/Resources/svg/icon_contacts_l.svg') no-repeat center / contain;
   transition: background-color 0.2s ease;
 }*/
 
