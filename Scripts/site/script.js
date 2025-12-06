@@ -516,7 +516,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log("📌 Notification script loaded");
 
-    fetch("/Resources/projects/messages.json")
+    fetch("resources/projects/messages.json")
         .then(res => {
             if (!res.ok) throw new Error("Message JSON missing!");
             return res.json();

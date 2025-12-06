@@ -5,8 +5,8 @@ const hueSlider = document.getElementById("hue-slider");
 let hideTimeout;
 
 const sfxSelects = [
-    new Audio('/Resources/sfx/color.mp3'),
-    new Audio('/Resources/sfx/color1.mp3')
+    new Audio('Resources/sfx/color.mp3'),
+    new Audio('Resources/sfx/color1.mp3')
 ];
 
 // Palette variable sets
