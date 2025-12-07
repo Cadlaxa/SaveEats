@@ -1,15 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
     const mainContainer = document.querySelector('.main-window');
-    const navIcons = document.querySelectorAll('.icon-item[data-target]');
     const closeButtons = document.querySelectorAll('.close-btn');
     const MobileCloseButtons = document.querySelectorAll('.nav-bar');
     const modalContainers = document.querySelectorAll('.modal-container');
     const toggleModalBtn = document.querySelector('.toggle-modal-btn');
-    const editProfileBtn = document.getElementById("editProfileBtn");
-    const editBannerBtn = document.getElementById("editBannerBtn");
-
-    const profileModal = document.getElementById("profile-img-modal");
-    const bannerModal = document.getElementById("banner-img-modal");
+    
     let highestZIndex = 1000;
     let activeModal = null;
 
@@ -42,34 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Keyboard Navigation for Icons & Modals using HOVER effect
-    let currentIconIndex = 0;
-    const icons = Array.from(navIcons);
-
-    function applyHoverState(index) {
-        icons.forEach(i => i.classList.remove("hover"));
-        currentIconIndex = (index + icons.length) % icons.length;
-        icons[currentIconIndex].classList.add("hover");
-    }
-
-    // Ensure keyboard navigation starts visually on 1st icon
-    applyHoverState(0);
-
-    // Add tabindex (but no visible outline)
-    icons.forEach(icon => icon.setAttribute("tabindex", "-1"));
-
-    document.addEventListener("keydown", (e) => {
-        const active = activeModal;
-        // Modal open → ESC closes modal
-        if (e.key === "Escape") {
-            const closeBtn = active.querySelector(".close-btn, .nav-bar");
-            if (closeBtn) {
-                closeBtn.click();
-                applyHoverState(currentIconIndex);
-            }
-        }
-    });
-
     // --- General Setup ---
     function applyFloatAnimation() {
         if (window.innerWidth > 768) {
@@ -88,37 +55,6 @@ document.addEventListener('DOMContentLoaded', () => {
         highestZIndex++;
         modalWindow.style.zIndex = highestZIndex;
     }
-
-    // OPEN PROFILE MODAL
-    editProfileBtn?.addEventListener("click", () => {
-        navigator.vibrate([50, 150, 50])
-        profileModal.classList.add("visible");
-    });
-
-    // OPEN BANNER MODAL
-    editBannerBtn?.addEventListener("click", () => {
-        navigator.vibrate([50, 150, 50])
-        bannerModal.classList.add("visible");
-    });
-
-    // --- Modal Opening ---
-    navIcons.forEach(icon => {
-        icon.addEventListener('click', () => {
-            const targetId = icon.dataset.target;
-            const targetModalContainer = document.getElementById(targetId);
-            if (targetModalContainer) {
-                targetModalContainer.classList.add('visible');
-                const targetModalWindow = targetModalContainer.querySelector('.modal-window');
-                if (targetModalWindow) {
-                    bringToFront(targetModalWindow);
-                    navigator.vibrate([50, 150, 50])
-                }
-                toggleModalBtn.style.display = 'block';
-                activeModal = targetModalContainer;
-                tryShowModalMessage(targetId);
-            }
-        });
-    });
 
     // --- Modal Closing and Reset ---
     closeButtons.forEach(button => {

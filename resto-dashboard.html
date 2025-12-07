@@ -169,52 +169,54 @@
           <div class="banner-container">
             <img id="bannerImage" src="assets/default-banner.jpg" class="banner-img">
             <input type="file" id="bannerInput" hidden>
-            <button class="edit-btn" id="editBannerBtn">Edit Banner</button>
+            <button class="edit-btn" id="editBannerBtn" data-target="banner-img-modal">Edit Banner</button>
           </div>
 
           <div class="profile-row">
             <div class="profile-pic-wrapper">
               <img id="profileImage" src="assets/default-profile.png" class="profile-img">
               <input type="file" id="profileInput" hidden>
-              <button class="edit-btn small" id="editProfileBtn">Edit</button>
+              <button class="edit-btn small" id="editProfileBtn" data-target="profile-img-modal">Edit</button>
             </div>
 
             <div class="profile-info">
-              <h2 id="restoName">Restaurant Name</h2>
-              <p id="restoEmail">email@example.com</p>
+                <h2 id="restoName">Restaurant Name</h2>
+                <p id="restoEmail">email@example.com</p>
             </div>
+            
+            <div class="form-grid3">
+              <div class="items-filter">
+                <label>Sort by:</label>
+                <select id="sortField">
+                  <option value="name">Name</option>
+                  <option value="createdAt">Date Added</option>
+                  <option value="expiryTime">Expiry Date</option>
+                  <option value="originalPrice">Original Price</option>
+                  <option value="discountedPrice">Discounted Price</option>
+                </select>
+
+                <select id="sortOrder">
+                  <option value="asc">Ascending</option>
+                  <option value="desc">Descending</option>
+                </select>
+              </div>
+            </div>
+              <button id="addItemBtn" class="add-item-btn">+</button>
           </div>
         </div>
-        
-        <div class="nav-icons">
-          <div class="icon-item" data-target="about-modal">
-            <div class="icon-about"></div>
-            <span>about</span>
+
+        <div class="project-grid-container">
+          <div class="form-grid3">
+
+          <div id="itemsGrid" class="items-grid"></div>
+          
           </div>
-          <div class="icon-item" data-target="links-modal">
-            <div class="icon-links"></div>
-            <span>links</span>
-          </div>
-          <div class="icon-item" data-target="project-modal">
-            <div class="icon-projects"></div>
-            <span>projects</span>
-          </div>
-          <div class="icon-item" data-target="faq-modal">
-            <div class="icon-faq"></div>
-            <span>faq</span>
-          </div>
-          <div class="icon-item" data-target="contact-modal">
-            <div class="icon-contacts"></div>
-            <span>contact</span>
-          </div>
+
         </div>
-        
-      </div>
-      <div class="social-links">
-        <p class="copyright">&copy; 2025 cadlaxa</p>
+
+
       </div>
     </div>
-
   </div>
 
   <!-- profile img -->
@@ -281,112 +283,71 @@
     </div>
   </div>
 
-  <!-- LINKS -->
-  <div id="links-modal" class="modal-container">
+  <!-- ITEMS -->
+  <div id="Items-modal" class="modal-container">
     <div class="modal-window">
-      <div class="modal-window-base modal-links">
+      <div class="modal-window-base modal-medium">
         <div class="window-header handle">
-          <span class="window-title">Links</span>
+          <span class="window-title">Adding new Item</span>
           <button class="close-btn">&times;</button>
         </div>
         <div class="modal-content ">
-          <div class="profile-container">
-            <div class="profile-header">
-              <div class="profile-name">
-                <h1><span class="cad-name">chunlinks...</span></h1>
-              </div>
+
+          <form id="addItemForm">
+
+            <!-- IMAGE PREVIEW -->
+            <div class="form-grid3">
+              <img id="itemPreviewImage" src="assets/default-food.png" class="item-preview-img">
+              <input type="file" id="itemImageInput" accept="image/*">
             </div>
-          </div>
-            <div class="link-grid-container">
 
-              <div class="link-item" data-link="https://discord.com/users/287149082877886464">
-                <div class="link-favicon">
-                  <i class="fab fa-discord"></i>
-                </div>
-                <div class="link-footer">
-                  <div class="view-link-btn">Discord</div>
-                </div>
-              </div>
+            <!-- ITEM NAME -->
+            <div class="form-grid3">
+              <label>Item Name</label>
+              <input type="text" id="itemName" required>
+            </div>
 
-              <div class="link-item" data-link="https://www.youtube.com/@cadlaxa">
-                <div class="link-favicon">
-                  <i class="fab fa-youtube"></i>
-                </div>
-                <div class="link-footer">
-                  <div class="view-link-btn">YouTube</div>
-                </div>
-              </div>
+            <!-- DESCRIPTION -->
+            <div class="form-grid3">
+              <label>Description</label>
+              <textarea id="itemDescription" rows="3"></textarea>
+            </div>
 
-              <div class="link-item" data-link="https://github.com/Cadlaxa">
-                <div class="link-favicon">
-                  <i class="fab fa-github"></i>
-                </div>
-                <div class="link-footer">
-                  <div class="view-link-btn">Github</div>
-                </div>
-              </div>
+            <!-- ORIGINAL PRICE -->
+            <div class="form-grid3">
+              <label>Original Price (₱)</label>
+              <input type="number" id="itemOriginalPrice" required>
+            </div>
 
-              <div class="link-item" data-link="mailto:cactusmusic30@gmail.com">
-                <div class="link-favicon">
-                  <i class="fa-solid fa-envelope-open-text"></i>
-                </div>
-                <div class="link-footer">
-                  <div class="view-link-btn">Email</div>
-                </div>
-              </div>
+            <!-- DISCOUNTED PRICE -->
+            <div class="form-grid3">
+              <label>Discounted Price (₱)</label>
+              <input type="number" id="itemDiscountedPrice" required>
+            </div>
 
-              <div class="link-item" data-link="https://bsky.app/profile/cadlaxa.bsky.social">
-                <div class="link-favicon">
-                  <i class="fab fa-bluesky"></i>
-                </div>
-                <div class="link-footer">
-                  <div class="view-link-btn">Bluesky</div>
-                </div>
-              </div>
+            <!-- ITEM QUANTITY -->
+            <div class="form-grid3">
+              <label>Item Quantity</label>
+              <input type="number" id="itemQuantity" required>
+            </div>
 
-              <div class="link-item" data-link="mailto:jhonpaolo.cadag@cvsu.edu.ph">
-                <div class="link-favicon">
-                  <i class="fa-solid fa-envelope-circle-check"></i>
-                </div>
-                <div class="link-footer">
-                  <div class="view-link-btn">Uni Email</div>
-                </div>
-              </div>
+            <!-- EXPIRATION TIME -->
+            <div class="form-grid3">
+              <label>Time to Expire</label>
+              <input type="datetime-local" id="itemExpiry" required>
+            </div>
 
-              <div class="link-item" data-link="https://ko-fi.com/cadlaxa">
-                <div class="link-favicon">
-                  <i class="fa-solid fa-mug-hot"></i>
-                </div>
-                <div class="link-footer">
-                  <div class="view-link-btn">Kofi</div>
-                </div>
-              </div>
+            <!-- BUTTON -->
+            <div class="form-grid">
+              <button type="submit" class="submit-btn">Save Item</button>
+            </div>
 
-              <div class="link-item" data-link="https://www.reddit.com/user/cadlaxa/">
-                <div class="link-favicon">
-                  <i class="fa-brands fa-reddit"></i>
-                </div>
-                <div class="link-footer">
-                  <div class="view-link-btn">Reddit</div>
-                </div>
-              </div>
+          </form>
 
-              <div class="link-item" data-link="https://cadlaxa.straw.page/">
-                <div class="link-favicon">
-                  <svg aria-labelledby="icons01-icon-6-title">
-                    <use xlink:href="#icon-8c067c2a901577560a630158598faca2"></use>
-                  </svg></a></li>
-                </div>
-                <div class="link-footer">
-                  <div class="view-link-btn">Straw Page</div>
-                </div>
-              </div>
-
-          </div>
         </div>
       </div>
-      <div class="nav-bar"></div>
     </div>
+      <div class="nav-bar"></div>
   </div>
 
   <!-- PROJECTS -->
@@ -734,6 +695,8 @@
   <script type="module" src="Scripts/site/firebase-init.js"></script>
   <script type="module" src="Scripts/site/auth.js"></script>
   <script type="module" src="Scripts/site/resto.js"></script>
+  <script type="module" src="Scripts/site/items.js"></script>
+
   </script>
 
   <script>

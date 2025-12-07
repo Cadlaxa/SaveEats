@@ -1,6 +1,12 @@
 import { app, auth, db } from "https://cadlaxa.github.io/SaveEats/Scripts/site/firebase-init.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+  addDoc,
+  collection,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
 
 document.addEventListener("DOMContentLoaded", () => {
   // -------------------------------
@@ -30,6 +36,113 @@ document.addEventListener("DOMContentLoaded", () => {
   const profileCropSize = 200;
   const bannerCropSize = { width: 400, height: 225 }; // 16:9 ratio
   const resolution = 0.9; // Compression resolution
+
+  // OPEN PROFILE MODAL
+  const editProfileBtn = document.getElementById("editProfileBtn");
+  const editBannerBtn = document.getElementById("editBannerBtn");
+  editProfileBtn.addEventListener("click", () => {
+      navigator.vibrate([50, 150, 50])
+      profileModal.classList.add("visible");
+  });
+
+  // OPEN BANNER MODAL
+  editBannerBtn.addEventListener("click", () => {
+      navigator.vibrate([50, 150, 50])
+      bannerModal.classList.add("visible");
+      
+  });
+
+  // ADD ITEM MODAL
+  const addItemBtn = document.getElementById("addItemBtn");
+  const addItemModal = document.getElementById("Items-modal");
+
+  addItemBtn.addEventListener("click", () => {
+    navigator.vibrate([50, 150, 50])
+    addItemModal.classList.add("visible");
+  });
+
+  const itemImageInput = document.getElementById("itemImageInput");
+  const itemPreviewImage = document.getElementById("itemPreviewImage");
+
+  let selectedItemImage = new Image();
+
+  itemImageInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      selectedItemImage.src = reader.result;
+      itemPreviewImage.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // SAVE ITEM TO FIRESTORE
+  addItemForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const user = auth.currentUser;
+    if (!user) return alert("Not logged in");
+
+    const name = document.getElementById("itemName").value.trim();
+    const description = document.getElementById("itemDescription").value.trim();
+    const originalPrice = Number(document.getElementById("itemOriginalPrice").value);
+    const discountedPrice = Number(document.getElementById("itemDiscountedPrice").value);
+    const expiryTime = document.getElementById("itemExpiry").value;
+    const quantity = Number(document.getElementById("itemQuantity").value);
+
+    if (!name || !originalPrice || !discountedPrice || !expiryTime || !quantity) {
+      return alert("Please fill all fields");
+    }
+
+    // COMPRESS TO 300x300
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+
+    const size = 300;
+    canvas.width = size;
+    canvas.height = size;
+
+    const minSize = Math.min(selectedItemImage.width, selectedItemImage.height);
+    const startX = (selectedItemImage.width - minSize) / 2;
+    const startY = (selectedItemImage.height - minSize) / 2;
+
+    ctx.drawImage(
+      selectedItemImage,
+      startX,
+      startY,
+      minSize,
+      minSize,
+      0,
+      0,
+      size,
+      size
+    );
+
+    const compressedBase64 = canvas.toDataURL("image/jpeg", resolution);
+
+    try {
+      await addDoc(collection(db, "items"), {
+        ownerId: user.uid,
+        name,
+        description,
+        originalPrice,
+        discountedPrice,
+        quantity,
+        expiryTime,
+        imageBase64: compressedBase64,
+        createdAt: serverTimestamp()
+      });
+
+      addItemForm.reset();
+      addItemModal.classList.remove("visible");
+      showNotif("Item added successfully!");
+
+    } catch (err) {
+      showError("Failed to add item: " + err.message);
+    }
+  });
 
   // -------------------------------
   // LOAD RESTO DATA
