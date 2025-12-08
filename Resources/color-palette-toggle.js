@@ -1,3 +1,7 @@
+import { auth, db } from "https://cadlaxa.github.io/SaveEats/Scripts/site/firebase-init.js";
+import { doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
 const paletteBtn = document.querySelector('.palette-btn');
 const paletteOptions = document.querySelector('.palette-options');
 const palettes = document.querySelectorAll('.palette');
@@ -186,9 +190,12 @@ palettes.forEach(palette => {
             document.cookie = `hueShift=${newHue}; path=/; max-age=31536000`;
 
             applyHueShiftTheme(newHue);
+            saveThemeToFirestore("hue-shift", newHue);
         } else {
             document.cookie = `theme=${choice}; path=/; max-age=31536000`;
             applyTheme(choice);
+            const themeHue = getThemeHue(themes[choice]);
+            saveThemeToFirestore(choice, themeHue);
         }
 
         setTimeout(() => {
@@ -270,6 +277,7 @@ hueSlider.addEventListener("input", (e) => {
     document.cookie = `theme=hue-shift; path=/; max-age=31536000`;
 
     applyHueShiftTheme(hue);
+    saveThemeToFirestore("hue-shift", hue);
 });
 
 
@@ -360,3 +368,72 @@ function HSLToHex(h, s, l, a = 1) {
     const alphaHex = `0${Math.round(a * 255).toString(16)}`.slice(-2).toUpperCase();
     return `#${toHex(f(0))}${toHex(f(8))}${toHex(f(4))}${alphaHex}`;
 }
+
+function isRestoDashboard() {
+  return window.location.pathname.includes("resto-dashboard.html");
+}
+async function saveThemeToFirestore(themeName, hueValue) {
+  if (!isRestoDashboard()) return;
+
+  const user = auth.currentUser;
+  if (!user) return;
+
+  try {
+    const restoRef = doc(db, "users", user.uid);
+
+    await updateDoc(restoRef, {
+      theme: themeName,
+      hueShift: hueValue ?? null,
+      themeUpdatedAt: new Date()
+    });
+
+    console.log("✅ Theme saved to Firestore");
+  } catch (err) {
+    console.error("❌ Failed saving theme:", err.message);
+  }
+}
+
+async function loadUserTheme(defaultTheme = "green") {
+  const user = auth.currentUser;
+  if (!user) {
+    console.warn("⚠️ No user logged in, applying default theme");
+    applyTheme(defaultTheme);
+    return;
+  }
+
+  try {
+    const userRef = doc(db, "users", user.uid);
+    const docSnap = await getDoc(userRef);
+
+    if (!docSnap.exists()) {
+      console.log("No saved theme found, applying default theme");
+      applyTheme(defaultTheme);
+      return;
+    }
+
+    const data = docSnap.data();
+    const theme = data.theme || defaultTheme;
+    const hue = data.hueShift ?? getThemeHue(themes[theme]);
+
+    if (theme === "hue-shift") {
+      applyHueShiftTheme(hue);
+      hueSlider.value = hue;
+    } else {
+      applyTheme(theme);
+      hueSlider.value = getThemeHue(themes[theme]);
+    }
+
+    console.log(`✅ Applied theme: ${theme} (hue: ${hue})`);
+  } catch (err) {
+    console.error("❌ Failed to load theme:", err.message);
+    applyTheme(defaultTheme);
+  }
+}
+
+window.addEventListener("load", () => {
+if (isRestoDashboard()) {
+    auth.onAuthStateChanged(user => {
+    if (user) loadUserTheme("green");
+    });
+}
+});
