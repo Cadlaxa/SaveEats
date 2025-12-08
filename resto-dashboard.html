@@ -11,6 +11,7 @@
   <link href="Resources/master-toggle.css" rel="stylesheet">
   <link href="Resources/clicks-toggle.css" rel="stylesheet">
   <link href="Resources/color-palette.css" rel="stylesheet">
+  <link href="Resources/add-item.css" rel="stylesheet">
 
   <!-- CSS for dark mode toggle button -->
   <link href="Resources/dark-mode-toggle.css" rel="stylesheet">
@@ -67,6 +68,10 @@
     <div class="loading-animation"></div>
       <div class="wave"></div>
   </div>
+
+    <button id="addItemBtn" class="item-toggle">
+        <i class="fa-solid fa-plus"></i>
+    </button>
 
     <!-- Master Toggle -->
     <button class="master-toggle">
@@ -187,7 +192,7 @@
             <div class="form-grid3">
               <div class="items-filter">
                 <label>Sort by:</label>
-                <select id="sortField">
+                <select id="sortField" class="sort">
                   <option value="name">Name</option>
                   <option value="createdAt">Date Added</option>
                   <option value="expiryTime">Expiry Date</option>
@@ -195,13 +200,13 @@
                   <option value="discountedPrice">Discounted Price</option>
                 </select>
 
-                <select id="sortOrder">
+                <select id="sortOrder" class="sort">
                   <option value="asc">Ascending</option>
                   <option value="desc">Descending</option>
                 </select>
               </div>
             </div>
-              <button id="addItemBtn" class="add-item-btn">+</button>
+              
           </div>
         </div>
 
@@ -242,9 +247,6 @@
               </div>
 
           </div>
-          <div class="about-section">
-            
-          </div>
         </div>
       </div>
       <div class="nav-bar"></div>
@@ -259,23 +261,18 @@
           <span class="window-title">Editing your Banner photo</span>
           <button class="close-btn">&times;</button>
         </div>
-        <div class="modal-content ">
+        <div class="modal-content">
           <div class="bg-container">
 
               <div class="form-grid2">
-
                 <div class="crop-preview-container">
                   <canvas id="cropBannerCanvas" width="400" height="225"></canvas>
                 </div>
                 
                 <input type="file" id="bannerSelectInput" accept="image/*">
                 <button class="submit-btn" id="saveBannerImage">Save</button>
-
               </div>
 
-          </div>
-          <div class="about-section">
-            
           </div>
         </div>
       </div>
@@ -283,7 +280,7 @@
     </div>
   </div>
 
-  <!-- ITEMS -->
+  <!-- Items -->
   <div id="Items-modal" class="modal-container">
     <div class="modal-window">
       <div class="modal-window-base modal-medium">
@@ -339,7 +336,7 @@
 
             <!-- BUTTON -->
             <div class="form-grid">
-              <button type="submit" class="submit-btn">Save Item</button>
+              <button type="submit" class="submit-btn" id="saveItemBtn">Save Item</button>
             </div>
 
           </form>

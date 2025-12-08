@@ -15,15 +15,18 @@ button.clicks-btn {
     z-index: 2000;
     transition: transform 0.2s ease-in-out, background-color 0.2s ease, display 0.3s ease-in-out opacity 0.3s ease;
     display: inline-block;
+    border: solid 3px var(--orangeD);
 }
 
 button.clicks-btn:hover {
     background-color: var(--orangeD, #fa8b4b);
     transform: translateY(-5px);
+    border: solid 3px var(--dark-orange);
 }
 
 button.clicks-btn:active {
     transform: var(--clicky);
+    border: solid 3px var(--dark-orange);
 }
 
 @keyframes shake {

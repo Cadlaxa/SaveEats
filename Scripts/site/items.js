@@ -208,9 +208,18 @@ window.editItem = async function(id) {
 // -------------------------------
 // SAVE ITEM
 // -------------------------------
-async function saveItem() {
+document.getElementById("addItemForm").addEventListener("submit", saveItem);
+let isSaving = false;
+async function saveItem(e) {
+  e?.preventDefault();
+  if (isSaving) return;
+  isSaving = true;
+
   const user = auth.currentUser;
-  if (!user) return alert("Not logged in");
+  if (!user) {
+    isSaving = false;
+    return alert("Not logged in");
+  }
 
   const name = itemName.value.trim();
   const description = itemDescription.value.trim();
@@ -220,36 +229,65 @@ async function saveItem() {
   const expiryTime = itemExpiry.value ? new Date(itemExpiry.value) : null;
 
   if (!name || !selectedItemImage.src || !originalPrice || !discountedPrice || !quantity) {
+    isSaving = false;
     return alert("Please fill all required fields");
   }
 
-  // Compress image
   const canvas = document.createElement("canvas");
   canvas.width = 300;
   canvas.height = 300;
   const ctx = canvas.getContext("2d");
   const minSide = Math.min(selectedItemImage.width, selectedItemImage.height);
-  ctx.drawImage(selectedItemImage, (selectedItemImage.width - minSide)/2, (selectedItemImage.height - minSide)/2, minSide, minSide, 0,0,300,300);
+  ctx.drawImage(
+    selectedItemImage,
+    (selectedItemImage.width - minSide) / 2,
+    (selectedItemImage.height - minSide) / 2,
+    minSide,
+    minSide,
+    0, 0, 300, 300
+  );
   const compressedBase64 = canvas.toDataURL("image/jpeg", 0.9);
 
   try {
     if (currentEditId) {
+      // TRUE UPDATE — NO DUPLICATES POSSIBLE
       await updateDoc(doc(db, "items", currentEditId), {
-        name, description, originalPrice, discountedPrice, quantity, expiryTime, imageBase64: compressedBase64
+        name,
+        description,
+        originalPrice,
+        discountedPrice,
+        quantity,
+        expiryTime,
+        imageBase64: compressedBase64
       });
+
       showNotif("Item updated successfully!");
     } else {
+      // TRUE ADD MODE
       await addDoc(collection(db, "items"), {
-        ownerId: user.uid, name, description, originalPrice, discountedPrice, quantity, expiryTime, imageBase64: compressedBase64, createdAt: serverTimestamp()
+        ownerId: user.uid,
+        name,
+        description,
+        originalPrice,
+        discountedPrice,
+        quantity,
+        expiryTime,
+        imageBase64: compressedBase64,
+        createdAt: serverTimestamp()
       });
+
       showNotif("Item added successfully!");
     }
+
     clearItemForm();
     itemsModal.classList.remove("visible");
-  } catch(err) {
+  } catch (err) {
     showError("Failed to save item: " + err.message);
   }
+
+  isSaving = false;
 }
+
 
 // -------------------------------
 // CLEAR FORM

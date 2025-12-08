@@ -55,12 +55,29 @@ document.addEventListener("DOMContentLoaded", () => {
   // ADD ITEM MODAL
   const addItemBtn = document.getElementById("addItemBtn");
   const addItemModal = document.getElementById("Items-modal");
+  const toggleIcon = document.querySelector(".item-toggle i");
+  toggleIcon.classList.add("switching");
+
+  function animateToggleIcon() {
+    toggleIcon.classList.add("switching");
+    setTimeout(() => toggleIcon.classList.remove("switching"), 600);
+  }
 
   addItemBtn.addEventListener("click", () => {
-    navigator.vibrate([50, 150, 50])
-    addItemModal.classList.add("visible");
+    navigator.vibrate([50, 150, 50]);
+    
+    const isVisible = addItemModal.classList.contains("visible");
+    if (isVisible) {
+      // Close modal
+      addItemModal.classList.remove("visible");
+      animateToggleIcon();
+    } else {
+      // Open modal
+      addItemModal.classList.add("visible");
+      animateToggleIcon();
+    }
   });
-
+  
   const itemImageInput = document.getElementById("itemImageInput");
   const itemPreviewImage = document.getElementById("itemPreviewImage");
 

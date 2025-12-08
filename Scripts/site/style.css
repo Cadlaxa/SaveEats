@@ -774,10 +774,10 @@ body {
 .bg-container {
   border-radius: var(--radius);
   background-color: var(--orangeHL);
-  display: flex;
-  flex-direction: column;
+  padding: 10px;
   align-items: center;
   text-align: center;
+  flex-direction: column;
 }
 
 .profile-container {
@@ -1405,14 +1405,14 @@ html {
 }
 
 .item-preview-img {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: block;
+  margin: 0 auto 25px auto;
   width: 300px;
   height: 300px;
   object-fit: cover;
   border-radius: 12px;
-  margin-bottom: 15px;
+  border: solid 3px var(--orange);
+  background-color: var(--orangeL1);
 }
 
 .form-grid {
@@ -1459,8 +1459,8 @@ html {
 .form-grid2 textarea,
 .form-grid3 input,
 .form-grid3 textarea {
-  background-color: var(--light-orange);
-  border: 2px solid var(--orangeL1);
+  background-color: var(--orangeHL);
+  border: 3px solid var(--orangeL1);
   border-radius: 6px;
   padding: 10px;
   font-size: 14px;
@@ -1491,7 +1491,18 @@ html {
 .form-grid3 input:focus,
 .form-grid3 textarea:focus{
   border-color: var(--orange);
-  background-color: var(--orangeHL);
+  background-color: var(--orangeL1);
+}
+
+.form-grid input:hover,
+.form-grid textarea:hover,
+.form-grid1 input:hover,
+.form-grid1 textarea:hover
+.form-grid2 input:hover,
+.form-grid2 textarea:hover,
+.form-grid3 input:hover,
+.form-grid3 textarea:hover{
+  border-color: var(--orange);
 }
 
 /* Make textarea span full width */
@@ -1694,6 +1705,17 @@ html {
   border: 4px solid var(--orangeL);
 }
 
+.banner-container:hover .banner-img {
+  transform: scale(1.05);
+}
+.banner-container:active .banner-img {
+  transform: scale(1.1);
+}
+.banner-container:hover {
+  border: 4px solid var(--orangeD);
+  background: var(--orangeL1);
+}
+
 .banner-img {
   width: 100%;
   height: 100%;
@@ -1719,6 +1741,16 @@ html {
   object-fit: cover;
   border: 4px solid var(--orangeL);
   background: var(--orangeHL);
+}
+
+.profile-img:hover {
+  object-fit: cover;
+  border: 4px solid var(--orangeD);
+  background: var(--orangeL1);
+  transform: scale(0.93);
+}
+.profile-img:active {
+  transform: scale(1);
 }
 
 .profile-info h2 {
@@ -1768,7 +1800,7 @@ html {
   font-size: 30px;
   width: 50px;
   height: 50px;
-  border-radius: 12px;
+  border-radius: 12tpx;
   border: none;
   cursor: pointer;
   background: var(--orange);
@@ -1786,7 +1818,7 @@ html {
 
 .items-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 16px;
   margin-top: 20px;
 }
@@ -1795,10 +1827,20 @@ html {
   background: var(--orangeHL);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 10px rgba(0,0,0,.2);
+  box-shadow: 0 4px 10px var(--orange);
   display: flex;
   flex-direction: column;
   transform: all 0.2s ease-in-out;
+  border: solid 3px var(--orangeL);
+}
+.item-card:hover {
+  box-shadow: 0 10px 25px var(--orange);
+  transform: scale(1.03);
+  border: solid 3px var(--orangeL);
+  background: var(--light-orange);
+}
+.item-card:active {
+  transform: scale(0.95);
 }
 
 .item-image {
@@ -1833,9 +1875,11 @@ html {
 }
 
 .item-actions {
+  position: relative;
   display: flex;
   gap: 8px;
   padding: 10px;
+  margin-top: auto;
 }
 
 .item-actions button {
@@ -1851,6 +1895,31 @@ html {
   transition: background 0.2s ease;
   transition: all 0.2s ease-in-out;
 }
+.sort {
+  flex: 1;
+  background: var(--orange);
+  border: none;
+  color: white;
+  font-weight: 600;
+  font-size: small;
+  padding: 5px;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+  transition: all 0.2s ease-in-out;
+  border: solid 3px var(--orangeD);
+}
+
+.sort:hover {
+  background: var(--orangeD);
+  border: solid 3px var(--dark-orange);
+  cursor: pointer;
+}
+
+.sort:active {
+  transform: var(--clicky);
+  border: solid 2px var(--dark-orange);
+  cursor: pointer;
+}
 
 .item-actions button:hover {
   background: var(--orangeD);
@@ -1859,6 +1928,17 @@ html {
 
 .item-actions button:active {
   transform: var(--clicky);
+}
+
+.items-filter {
+  position: absolute;
+  right: 10px;
+  gap: 15px;
+  margin-top: -20px;
+}
+
+.items-filter label{
+  margin-right: 5px;
 }
 
 @media (max-width: 992px) {

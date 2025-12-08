@@ -15,15 +15,18 @@ button.palette-btn {
     z-index: 2000;
     transition: all 0.2s ease-in-out;
     display: inline-block;
+    border: solid 3px var(--orangeD);
 }
 
 button.palette-btn:hover {
     background-color: var(--orangeD, #fa8b4b);
     transform: translateY(-5px);
+    border: solid 3px var(--dark-orange);
 }
 
 button.palette-btn:active {
     transform: var(--clicky);
+    border: solid 3px var(--dark-orange);
 }
 
 @keyframes waveBrush {
