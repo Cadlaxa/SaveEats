@@ -1321,7 +1321,7 @@ html {
 }
 
 .toggle-modal-btn:hover {
-  background-color: var(--orangeD, #fa8b4b);
+  background-color: var(--orangeD);
   transform: translateY(-5px);
 }
 

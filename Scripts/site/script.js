@@ -62,7 +62,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const parentModalContainer = button.closest('.modal-container');
             if (window.innerWidth > 600) {
                 button.addEventListener('click', () => {
-                    const parentModalContainer = button.closest('.modal-container');
                     if (parentModalContainer) {
                         parentModalContainer.classList.remove('visible');
                     }

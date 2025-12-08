@@ -1,8 +1,8 @@
 /* styling for dark mode toggle button */
 .log-out-toggle {
     position: fixed;
-    bottom: 65px;
-    left: 10px;
+    bottom: 10px;
+    right: 10px;
     width: 45px;
     height: 45px;
     border-radius: 50%;

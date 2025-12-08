@@ -12,6 +12,7 @@
   <link href="Resources/clicks-toggle.css" rel="stylesheet">
   <link href="Resources/color-palette.css" rel="stylesheet">
   <link href="Resources/add-item.css" rel="stylesheet">
+  <link href="Resources/log-out.css" rel="stylesheet">
 
   <!-- CSS for dark mode toggle button -->
   <link href="Resources/dark-mode-toggle.css" rel="stylesheet">
@@ -71,6 +72,10 @@
 
     <button id="addItemBtn" class="item-toggle">
         <i class="fa-solid fa-plus"></i>
+    </button>
+
+    <button class="log-out-toggle">
+        <i class="fa-solid fa-power-off"></i>
     </button>
 
     <!-- Master Toggle -->
@@ -144,23 +149,6 @@
       </svg>
     </div>
     
-  </div>
-
-  <div id="mobile-banner">
-      <img src="Resources/icon.png" alt="Paolo Cadag" class="profile-photo-banner">
-      <span id="banner-text">
-          <b class="cad-name">📢 Hey there!</b>
-          this site is best experienced on desktop
-      </span>
-      <button class="close-btn-notif" id="close-banner">&times;</button>
-  </div>
-
-  <div id="modal-notify" class="modal-notify hidden">
-      <img src="Resources/icon.png" alt="Paolo Cadag" class="profile-photo-banner">
-      <span id="modal-notify-text">
-          <!-- Dynamic text goes here -->
-      </span>
-      <button class="close-btn-notif" id="close-modal-notify">&times;</button>
   </div>
 
   <div class="window-container main-window">
@@ -343,8 +331,8 @@
 
         </div>
       </div>
-    </div>
       <div class="nav-bar"></div>
+    </div>
   </div>
 
   <!-- PROJECTS -->
@@ -687,7 +675,6 @@
   <!--<script src="Resources/projects.js"></script>-->
   <script src="Resources/master-toggle.js"></script>a
   <script src="Resources/color-palette-toggle.js"></script>
-  <script src="Resources/tabs.js"></script>
   <script src="Resources/cursor.js"></script>
   <script type="module" src="Scripts/site/firebase-init.js"></script>
   <script type="module" src="Scripts/site/auth.js"></script>

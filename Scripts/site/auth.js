@@ -61,8 +61,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function showSubmitModalAndRedirect(passedType) {
     submitModal.classList.add("visible");
-    await new Promise(requestAnimationFrame);
-
     let userType = passedType || "user";
     const user = auth.currentUser;
 
@@ -129,7 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
     } catch (error) {
-      console.error("Error fetching user data:", error);
+      showError("Error fetching user data:", error);
       // Optional: sign out on error
       await auth.signOut();
       window.location.href = "index.html";
@@ -257,7 +255,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const resto_username = document.getElementById("restoname").value.trim();
 
     if (password !== passwordRep) {
-      alert("Passwords do not match!");
+      showError("Passwords do not match!");
       return;
     }
     if (!resto_username) {
@@ -280,7 +278,28 @@ document.addEventListener("DOMContentLoaded", () => {
       showSubmitModalAndRedirect("restaurant");
       restoForm.reset();
     } catch (error) {
-      alert(error.message);
+      showError(error.message);
+    }
+  });
+
+  // -------------------------------
+  // LOGOUT BUTTON
+  // -------------------------------
+  const logoutBtn = document.querySelector(".log-out-toggle");
+
+  logoutBtn?.addEventListener("click", async () => {
+    try {
+      showNotif("Logging out...");
+      navigator.vibrate?.([50, 100, 50]);
+      setTimeout(async () => {
+        await auth.signOut();
+        localStorage.clear();
+        window.location.href = "index.html";
+      }, 3000);
+
+    } catch (err) {
+      console.error("Logout failed:", err);
+      showError("Logout failed. Please try again.");
     }
   });
 });
