@@ -43,7 +43,9 @@ function loadRestaurants() {
         <div class="restaurant-logo-container">
           <img class="restaurant-logo" src="${logo}" alt="Logo">
         </div>
-        <div class="restaurant-name">${name}</div>
+        <div class="bottom-row1">
+          <div class="restaurant-name">${name}</div>
+        </div>
       `;
 
       div.onclick = () => openRestaurant(name, restoId, logo, banner);

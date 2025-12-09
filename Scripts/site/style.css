@@ -765,7 +765,7 @@ body {
 .modal-content {
   max-height: 70vh;
   overflow-y: auto;
-  padding: 2rem;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
   cursor: auto;
@@ -1790,6 +1790,52 @@ html {
   right: 0;
 }
 
+.sort {
+  flex: 1;
+  background: var(--orange);
+  border: none;
+  color: white;
+  font-weight: 600;
+  font-size: small;
+  padding: 5px;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+  transition: all 0.2s ease-in-out;
+  border: solid 3px var(--orangeD);
+}
+
+.sort:hover {
+  background: var(--orangeD);
+  border: solid 3px var(--dark-orange);
+  cursor: pointer;
+}
+
+.sort:active {
+  transform: var(--clicky);
+  border: solid 2px var(--dark-orange);
+  cursor: pointer;
+}
+
+.item-actions button:hover {
+  background: var(--orangeD);
+  transform: translateY(-3px);
+}
+
+.item-actions button:active {
+  transform: var(--clicky);
+}
+
+.items-filter {
+  position: absolute;
+  right: 10px;
+  gap: 15px;
+  margin-top: -20px;
+}
+
+.items-filter label{
+  margin-right: 5px;
+}
+
 /* Items in resto */
 .items-header {
   display: flex;
@@ -1904,6 +1950,13 @@ html {
   flex-direction: column;
 }
 
+.bottom-row1 {
+  margin-top: auto;
+  padding-left: 15px;
+  padding-right: 15px;
+  display: flex;
+  flex-direction: column;
+}
 
 .item-actions button {
   flex: 1;
@@ -1918,51 +1971,6 @@ html {
   transition: background 0.2s ease;
   transition: all 0.2s ease-in-out;
 }
-.sort {
-  flex: 1;
-  background: var(--orange);
-  border: none;
-  color: white;
-  font-weight: 600;
-  font-size: small;
-  padding: 5px;
-  border-radius: 6px;
-  transition: background 0.2s ease;
-  transition: all 0.2s ease-in-out;
-  border: solid 3px var(--orangeD);
-}
-
-.sort:hover {
-  background: var(--orangeD);
-  border: solid 3px var(--dark-orange);
-  cursor: pointer;
-}
-
-.sort:active {
-  transform: var(--clicky);
-  border: solid 2px var(--dark-orange);
-  cursor: pointer;
-}
-
-.item-actions button:hover {
-  background: var(--orangeD);
-  transform: translateY(-3px);
-}
-
-.item-actions button:active {
-  transform: var(--clicky);
-}
-
-.items-filter {
-  position: absolute;
-  right: 10px;
-  gap: 15px;
-  margin-top: -20px;
-}
-
-.items-filter label{
-  margin-right: 5px;
-}
 
 /* Home user page */
 .restaurant-grid {
@@ -1973,22 +1981,22 @@ html {
 }
 
 .restaurant-card {
+  /*background: linear-gradient(0deg, var(--orangeHL) 30%, var(--orange));*/
   background: var(--orangeHL);
   border-radius: 12px;
   overflow: hidden;
-  cursor: pointer;
-  transition: transform .2s ease-in-out;
-  text-align: center;
-  position: relative;
+  box-shadow: 0 4px 10px var(--orange);
+  display: flex;
+  flex-direction: column;
   border: solid 3px var(--orangeL);
-  transition: all 0.2s ease-in-out;
 }
 
 .restaurant-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 10px 25px var(--orange);
   border: solid 3px var(--orangeD);
-  background: var(--light-orange);
+  background: var(--orangeL1);
+  transform: all 0.2s ease-in-out;
 }
 .restaurant-card:hover .restaurant-logo {
   border: solid 3px var(--orange);
@@ -2010,8 +2018,8 @@ html {
 
 /* Circular profile image */
 .restaurant-logo {
-  width: 85px;
-  height: 85px;
+  width: 80px;
+  height: 80px;
   object-fit: cover;
   border-radius: 50%;
   border: 3px solid var(--orangeL);
@@ -2021,10 +2029,11 @@ html {
 /* Name */
 .restaurant-name {
   margin-top: auto;
-  padding: 40px 0px 10px; /* more space because logo overlaps */
+  padding: 10px 0px 10px; /* more space because logo overlaps */
   font-size: 1.2rem;
   font-weight: 700;
   color: var(--orangeD);
+  line-height: 1.2em;
 }
 
 @media (max-width: 992px) {
@@ -2035,6 +2044,19 @@ html {
 }
 
 @media (max-width: 600px) {
+
+  .modal-small,
+  .modal-small1,
+  .modal-small2,
+  .modal-medium,
+  .modal-medium1
+  .modal-medium2,
+  .modal-large,
+  .modal-large1
+  .modal-large2 {
+    width: 90vw;
+  }
+
   .img-banner iframe,
   .img-banner blockquote {
     transform: scale(1);
@@ -2262,6 +2284,33 @@ html {
     background-color: var(--mobile-icon-item);
   }
 
+  .profile-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-top: -80px;
+  }
+
+  .profile-info {
+    text-align: center;
+  }
+
+  .items-filter {
+    position: static;   /* remove absolute positioning */
+    margin-top: 10px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .items-filter label {
+    margin: 0;
+  }
+
+  .sort {
+    width: auto;
+  }
 }
 
 /* Mobile Responsiveness */
@@ -2280,13 +2329,11 @@ html {
   }
 
   .home-window-content {
-    max-height: 70vh;
+    max-height: 80vh;
     padding: 50px 20px;
     text-align: center;
     background-color: var(--light-orange);
     opacity: 1;
-    overflow-y: auto;
-    /*animation: shiftPattern 8s linear infinite;*/
   }
 
   .modal-window {
