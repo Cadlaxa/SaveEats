@@ -361,7 +361,8 @@ body {
   transform: var(--clicky);
 }
 
-.window-title {
+.window-title,
+.window-title1 {
   font-weight: 550;
   font-size: large;
   user-select: none;
@@ -1939,6 +1940,69 @@ html {
 
 .items-filter label{
   margin-right: 5px;
+}
+
+/* Home user page */
+.restaurant-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 14px;
+  padding: 10px;
+}
+
+.restaurant-card {
+  background: var(--orangeHL);
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform .2s ease-in-out;
+  text-align: center;
+  position: relative;
+  border: solid 3px var(--orangeL);
+  transition: all 0.2s ease-in-out;
+}
+
+.restaurant-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px var(--orange);
+  border: solid 3px var(--orangeD);
+  background: var(--light-orange);
+}
+.restaurant-card:hover .restaurant-logo {
+  border: solid 3px var(--orange);
+}
+
+/* Banner */
+.restaurant-banner img {
+  width: 100%;
+  height: 90px;
+  object-fit: cover;
+}
+
+.restaurant-logo-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: -45px;
+}
+
+/* Circular profile image */
+.restaurant-logo {
+  width: 85px;
+  height: 85px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid var(--orangeL);
+  background: var(--orangeL1);
+}
+
+/* Name */
+.restaurant-name {
+  margin-top: auto;
+  padding: 40px 0px 10px; /* more space because logo overlaps */
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--orangeD);
 }
 
 @media (max-width: 992px) {

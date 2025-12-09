@@ -1,5 +1,12 @@
-import { auth, db } from "https://cadlaxa.github.io/SaveEats/Scripts/site/firebase-init.js";
-import { doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+    auth,
+    db
+} from "https://cadlaxa.github.io/SaveEats/Scripts/site/firebase-init.js";
+import {
+    doc,
+    updateDoc,
+    getDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 
 const paletteBtn = document.querySelector('.palette-btn');
@@ -53,11 +60,11 @@ const themes = {
     },
     blue: {
         "--yellow": "#e0f2fe",
-        "--orange": "#3b82f6",     // Primary Blue
-        "--orangeL": "#60a5fa",    // Lighter Blue
-        "--orangeL1": "#93c5fd",   // Even Lighter Blue
-        "--orangeHL": "#c2dcff",   // Blue Highlight/Accent
-        "--orangeD": "#2563eb",    // Darker Blue
+        "--orange": "#3b82f6", // Primary Blue
+        "--orangeL": "#60a5fa", // Lighter Blue
+        "--orangeL1": "#93c5fd", // Even Lighter Blue
+        "--orangeHL": "#c2dcff", // Blue Highlight/Accent
+        "--orangeD": "#2563eb", // Darker Blue
         "--ptext": "#1e3a8a",
         "--light-gray": "#f0f9ff",
         "--dark-gray": "#1e293b",
@@ -71,11 +78,11 @@ const themes = {
     },
     green: {
         "--yellow": "#e6f9df",
-        "--orange": "#10b981",     // Primary Green
-        "--orangeL": "#34d399",    // Lighter Green
-        "--orangeL1": "#86efac",   // Even Lighter Green
-        "--orangeHL": "#c5fcd8",   // Green Highlight/Accent
-        "--orangeD": "#059669",    // Darker Green
+        "--orange": "#10b981", // Primary Green
+        "--orangeL": "#34d399", // Lighter Green
+        "--orangeL1": "#86efac", // Even Lighter Green
+        "--orangeHL": "#c5fcd8", // Green Highlight/Accent
+        "--orangeD": "#059669", // Darker Green
         "--ptext": "#053427",
         "--light-gray": "#f7fff9",
         "--dark-gray": "#063e2f",
@@ -90,11 +97,11 @@ const themes = {
 
     pink: {
         "--yellow": "#fdf2f8",
-        "--orange": "#ec4899",     // Primary Pink
-        "--orangeL": "#f472b6",    // Lighter Pink
-        "--orangeL1": "#f9a8d4",   // Even Lighter Pink
-        "--orangeHL": "#fccce8",   // Pink Highlight/Accent
-        "--orangeD": "#be185d",    // Darker Pink
+        "--orange": "#ec4899", // Primary Pink
+        "--orangeL": "#f472b6", // Lighter Pink
+        "--orangeL1": "#f9a8d4", // Even Lighter Pink
+        "--orangeHL": "#fccce8", // Pink Highlight/Accent
+        "--orangeD": "#be185d", // Darker Pink
         "--ptext": "#831843",
         "--light-gray": "#fff0f7",
         "--dark-gray": "#500724",
@@ -108,11 +115,11 @@ const themes = {
     },
     purple: {
         "--yellow": "#f5e1ff",
-        "--orange": "#8b5cf6",     // Primary Purple
-        "--orangeL": "#a78bfa",    // Lighter Purple
-        "--orangeL1": "#c4b5fd",   // Even Lighter Purple
-        "--orangeHL": "#d8cffc",   // Purple Highlight/Accent
-        "--orangeD": "#7c3aed",    // Darker Purple
+        "--orange": "#8b5cf6", // Primary Purple
+        "--orangeL": "#a78bfa", // Lighter Purple
+        "--orangeL1": "#c4b5fd", // Even Lighter Purple
+        "--orangeHL": "#d8cffc", // Purple Highlight/Accent
+        "--orangeD": "#7c3aed", // Darker Purple
         "--ptext": "#2e1065",
         "--light-gray": "#faf5ff",
         "--dark-gray": "#4c1d95",
@@ -125,15 +132,15 @@ const themes = {
         "--cursor": "#d8cffc50"
     },
     red: {
-        "--yellow": "#ffeeee",      // Lightest accent
-        "--orange": "#fc5656",      // Primary Red
-        "--orangeL": "#f87171",     // Lighter Red
-        "--orangeL1": "#fca5a5",    // Even Lighter Red
-        "--orangeHL": "#fabebe",    // Red Highlight/Accent
-        "--orangeD": "#dc2626",     // Darker Red
-        "--ptext": "#7f1d1d",       // Dark text (dark red)
-        "--light-gray": "#fffafa",  // Very light background
-        "--dark-gray": "#450a0a",   // Dark background/text
+        "--yellow": "#ffeeee", // Lightest accent
+        "--orange": "#fc5656", // Primary Red
+        "--orangeL": "#f87171", // Lighter Red
+        "--orangeL1": "#fca5a5", // Even Lighter Red
+        "--orangeHL": "#fabebe", // Red Highlight/Accent
+        "--orangeD": "#dc2626", // Darker Red
+        "--ptext": "#7f1d1d", // Dark text (dark red)
+        "--light-gray": "#fffafa", // Very light background
+        "--dark-gray": "#450a0a", // Dark background/text
         "--icon-drop-shadow": "#f87171",
         "--light-orange": "#ffeeee",
         "--light-orange1": "#fffafa",
@@ -145,8 +152,10 @@ const themes = {
 };
 
 function getThemeHue(theme) {
-    const primary = theme["--orange"] ;
-    const { h } = hexToHSL(primary);
+    const primary = theme["--orange"];
+    const {
+        h
+    } = hexToHSL(primary);
     return h;
 }
 
@@ -161,10 +170,10 @@ function hidePalette() {
 }
 
 function resetHideTimer() {
-  clearTimeout(hideTimeout);
-  hideTimeout = setTimeout(() => {
-    hidePalette();
-  }, 3000); // 3 seconds
+    clearTimeout(hideTimeout);
+    hideTimeout = setTimeout(() => {
+        hidePalette();
+    }, 3000); // 3 seconds
 }
 
 ['mousemove', 'click', 'touchstart', 'touchmove'].forEach(event => {
@@ -180,7 +189,7 @@ palettes.forEach(palette => {
         const choice = palette.dataset.palette;
         const paletteIcon = paletteBtn.querySelector("i");
         paletteIcon.classList.add("switching");
-        
+
 
         if (choice === "hue-shift") {
             const newHue = Math.floor(Math.random() * 360);
@@ -262,7 +271,7 @@ function applyHueShiftTheme(deg) {
 
     // Save hue value and update slider + cookies
     document.documentElement.style.setProperty("--hue-value", deg);
-    
+
     localStorage.setItem("savedHue", deg);
     document.cookie = `hueShift=${deg}; path=/; max-age=31536000`;
 
@@ -285,7 +294,7 @@ hueSlider.addEventListener("input", (e) => {
 function shiftHue(deg) {
     const styles = getComputedStyle(document.documentElement);
 
-    for (let varName in themes.base) { 
+    for (let varName in themes.base) {
         let original = styles.getPropertyValue(varName).trim();
         if (!original.startsWith("#")) continue;
 
@@ -295,19 +304,27 @@ function shiftHue(deg) {
 }
 
 function hueShiftColor(hex, deg) {
-    let { h, s, l, a } = hexToHSL(hex);
+    let {
+        h,
+        s,
+        l,
+        a
+    } = hexToHSL(hex);
 
     h = (h + deg) % 360;
 
     // saturation & brightness
     s = Math.min(100, s * 0.6);
-    l = Math.min(100, Math.max(10, l)); 
+    l = Math.min(100, Math.max(10, l));
 
     return HSLToHex(h, s, l, a);
 }
 
 function hexToHSL(H) {
-    let r = 0, g = 0, b = 0, a = 1;
+    let r = 0,
+        g = 0,
+        b = 0,
+        a = 1;
 
     // 4-digit hex (#RGBA)
     if (H.length === 5) {
@@ -315,20 +332,20 @@ function hexToHSL(H) {
         g = parseInt(H[2] + H[2], 16);
         b = parseInt(H[3] + H[3], 16);
         a = parseInt(H[4] + H[4], 16) / 255;
-    } 
+    }
     // 8-digit hex (#RRGGBBAA)
     else if (H.length === 9) {
         r = parseInt(H[1] + H[2], 16);
         g = parseInt(H[3] + H[4], 16);
         b = parseInt(H[5] + H[6], 16);
         a = parseInt(H[7] + H[8], 16) / 255;
-    } 
+    }
     // 3-digit hex (#RGB)
     else if (H.length === 4) {
         r = parseInt(H[1] + H[1], 16);
         g = parseInt(H[2] + H[2], 16);
         b = parseInt(H[3] + H[3], 16);
-    } 
+    }
     // 6-digit hex (#RRGGBB)
     else {
         r = parseInt(H[1] + H[2], 16);
@@ -336,13 +353,17 @@ function hexToHSL(H) {
         b = parseInt(H[5] + H[6], 16);
     }
 
-    r /= 255; g /= 255; b /= 255;
+    r /= 255;
+    g /= 255;
+    b /= 255;
 
     let cmin = Math.min(r, g, b),
         cmax = Math.max(r, g, b),
         delta = cmax - cmin;
 
-    let h = 0, s = 0, l = (cmax + cmin) / 2;
+    let h = 0,
+        s = 0,
+        l = (cmax + cmin) / 2;
 
     if (delta !== 0) {
         if (cmax === r) h = ((g - b) / delta) % 6;
@@ -356,11 +377,17 @@ function hexToHSL(H) {
     s = +(s * 100).toFixed(1);
     l = +(l * 100).toFixed(1);
 
-    return { h, s, l, a };
+    return {
+        h,
+        s,
+        l,
+        a
+    };
 }
 
 function HSLToHex(h, s, l, a = 1) {
-    s /= 100; l /= 100;
+    s /= 100;
+    l /= 100;
     const k = n => (n + h / 30) % 12;
     const a1 = s * Math.min(l, 1 - l);
     const f = n => l - a1 * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
@@ -370,70 +397,163 @@ function HSLToHex(h, s, l, a = 1) {
 }
 
 function isRestoDashboard() {
-  return window.location.pathname.includes("resto-dashboard.html");
+    return window.location.pathname.includes("resto-dashboard.html");
 }
 async function saveThemeToFirestore(themeName, hueValue) {
-  if (!isRestoDashboard()) return;
+    if (!isRestoDashboard()) return;
 
-  const user = auth.currentUser;
-  if (!user) return;
+    const user = auth.currentUser;
+    if (!user) return;
 
-  try {
-    const restoRef = doc(db, "users", user.uid);
+    try {
+        const restoRef = doc(db, "users", user.uid);
 
-    await updateDoc(restoRef, {
-      theme: themeName,
-      hueShift: hueValue ?? null,
-      themeUpdatedAt: new Date()
-    });
+        await updateDoc(restoRef, {
+            theme: themeName,
+            hueShift: hueValue ?? null,
+            themeUpdatedAt: new Date()
+        });
 
-    console.log("✅ Theme saved to Firestore");
-  } catch (err) {
-    console.error("❌ Failed saving theme:", err.message);
-  }
+        console.log("✅ Theme saved to Firestore");
+    } catch (err) {
+        console.error("❌ Failed saving theme:", err.message);
+    }
 }
 
 async function loadUserTheme(defaultTheme = "green") {
-  const user = auth.currentUser;
-  if (!user) {
-    console.warn("⚠️ No user logged in, applying default theme");
-    applyTheme(defaultTheme);
-    return;
-  }
+    const user = auth.currentUser;
+    let cachedTheme = document.cookie.split('; ').find(r => r.startsWith("theme="))?.split("=")[1];
+    let cachedHue = parseInt(document.cookie.split('; ').find(r => r.startsWith("hueShift="))?.split("=")[1]);
 
-  try {
-    const userRef = doc(db, "users", user.uid);
-    const docSnap = await getDoc(userRef);
+    if (!user) {
+        if (!cachedTheme) {
+            cachedTheme = localStorage.getItem("savedTheme") || "green"; // fallback
+            cachedHue = parseInt(localStorage.getItem("savedHue")) || 0;
+        }
 
-    if (!docSnap.exists()) {
-      console.log("No saved theme found, applying default theme");
-      applyTheme(defaultTheme);
-      return;
+        if (cachedTheme === "hue-shift") {
+            applyHueShiftTheme(cachedHue);
+            hueSlider.value = cachedHue;
+        } else {
+            applyTheme(cachedTheme);
+            hueSlider.value = getThemeHue(themes[cachedTheme]);
+        }
+        return;
     }
 
-    const data = docSnap.data();
-    const theme = data.theme || defaultTheme;
-    const hue = data.hueShift ?? getThemeHue(themes[theme]);
+    try {
+        const userRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(userRef);
 
-    if (theme === "hue-shift") {
-      applyHueShiftTheme(hue);
-      hueSlider.value = hue;
+        if (!docSnap.exists()) {
+            console.log("No saved theme found, applying default theme");
+            applyTheme(defaultTheme);
+            return;
+        }
+
+        const data = docSnap.data();
+        const theme = data.theme || defaultTheme;
+        const hue = data.hueShift ?? getThemeHue(themes[theme]);
+
+        if (theme === "hue-shift") {
+            applyHueShiftTheme(hue);
+            hueSlider.value = hue;
+        } else {
+            applyTheme(theme);
+            hueSlider.value = getThemeHue(themes[theme]);
+        }
+
+        console.log(`✅ Applied theme: ${theme} (hue: ${hue})`);
+    } catch (err) {
+        console.error("❌ Failed to load theme:", err.message);
+        applyTheme(defaultTheme);
+    }
+}
+
+let currentRestoTheme = null;
+const restoModal = document.getElementById("resto-modal");
+
+
+function applyModalTheme(themeName, hueValue) {
+    if (themeName) {
+        // Apply the restaurant's temporary theme
+        if (themeName === "hue-shift") {
+            applyHueShiftTheme(hueValue ?? 0);
+        } else {
+            applyTheme(themeName);
+            if (hueValue != null && themeName === "hue-shift") {
+                applyHueShiftTheme(hueValue);
+            }
+        }
+        currentRestoTheme = { theme: themeName, hue: hueValue };
     } else {
-      applyTheme(theme);
-      hueSlider.value = getThemeHue(themes[theme]);
-    }
+        // Revert to the user's last cached theme (not green)
+        let cachedTheme = document.cookie.split('; ').find(r => r.startsWith("theme="))?.split("=")[1];
+        let cachedHue = parseInt(document.cookie.split('; ').find(r => r.startsWith("hueShift="))?.split("=")[1]);
 
-    console.log(`✅ Applied theme: ${theme} (hue: ${hue})`);
-  } catch (err) {
-    console.error("❌ Failed to load theme:", err.message);
-    applyTheme(defaultTheme);
-  }
+        if (!cachedTheme) {
+            cachedTheme = localStorage.getItem("savedTheme") || "green";
+            cachedHue = parseInt(localStorage.getItem("savedHue")) || 0;
+        }
+
+        if (cachedTheme === "hue-shift") {
+            applyHueShiftTheme(cachedHue);
+            hueSlider.value = cachedHue;
+        } else {
+            applyTheme(cachedTheme);
+            hueSlider.value = getThemeHue(themes[cachedTheme]);
+        }
+
+        currentRestoTheme = null;
+    }
+}
+
+// Observe modal visibility changes
+if (restoModal) {
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach(m => {
+            if (m.attributeName === "class") {
+                const isOpen = restoModal.classList.contains("visible");
+
+                if (isOpen) {
+                    const themeName = restoModal.dataset.theme;
+                    const hue = parseInt(restoModal.dataset.hueShift) || 0;
+                    applyModalTheme(themeName, hue);
+                } else {
+                    // Modal closed → revert to user theme
+                    applyModalTheme(null);
+                }
+            }
+        });
+    });
+    observer.observe(restoModal, { attributes: true });
 }
 
 window.addEventListener("load", () => {
-if (isRestoDashboard()) {
-    auth.onAuthStateChanged(user => {
-    if (user) loadUserTheme("green");
-    });
-}
+    if (isRestoDashboard()) {
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                loadUserTheme("green"); // fallback if Firestore has no theme
+            } else {
+                // Apply cached cookie/localStorage theme for unauthenticated users
+                loadUserThemeFromCache();
+            }
+        });
+    }
 });
+
+function loadUserThemeFromCache() {
+    let cachedTheme = document.cookie.split('; ').find(r => r.startsWith("theme="))?.split("=")[1];
+    let cachedHue = parseInt(document.cookie.split('; ').find(r => r.startsWith("hueShift="))?.split("=")[1]);
+
+    if (!cachedTheme) cachedTheme = localStorage.getItem("savedTheme") || "green";
+    if (!cachedHue) cachedHue = parseInt(localStorage.getItem("savedHue")) || 0;
+
+    if (cachedTheme === "hue-shift") {
+        applyHueShiftTheme(cachedHue);
+        hueSlider.value = cachedHue;
+    } else {
+        applyTheme(cachedTheme);
+        hueSlider.value = getThemeHue(themes[cachedTheme]);
+    }
+}
