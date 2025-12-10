@@ -367,7 +367,7 @@ document.addEventListener("DOMContentLoaded", () => {
                   (qrMessage) => {
                       try {
                           const data = JSON.parse(qrMessage);
-                          stopQrScan();
+                          //stopQrScan();
                           handleQrScan(data.itemId, data.userId).finally(() => {
                               scanningLock = false; // unlock after processing
                           });
