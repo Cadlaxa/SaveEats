@@ -237,7 +237,18 @@ async function saveItem(e) {
   const originalPrice = Number(itemOriginalPrice.value);
   const discountedPrice = Number(itemDiscountedPrice.value);
   const quantity = Number(itemQuantity.value);
-  const expiryTime = itemExpiry.value ? new Date(itemExpiry.value) : null;
+  let expiryTime = null;
+  if (!currentEditId) {
+      // Add Mode
+      expiryTime = itemExpiry.value ? new Date(itemExpiry.value) : null;
+  } else {
+      // Edit Mode — only update if user typed something
+      if (itemExpiry.value) {
+          expiryTime = new Date(itemExpiry.value);
+      } else {
+          expiryTime = originalExpiry; // <- keep original
+      }
+  }
 
   if (!name || !selectedItemImage.src || !originalPrice || !discountedPrice || !quantity) {
     isSaving = false;
@@ -298,7 +309,6 @@ async function saveItem(e) {
 
   isSaving = false;
 }
-
 
 // -------------------------------
 // CLEAR FORM

@@ -281,60 +281,33 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  let scanningLock = false; // prevent double redemption
-
-  async function handleQrScan(itemId, userId) {
-      if (scanningLock) return; // already processing
-      scanningLock = true;
-
+  async function handleQrScan(itemId) {
       try {
-          // 1. Fetch the item
           const itemRef = doc(db, "items", itemId);
           const itemSnap = await getDoc(itemRef);
+
           if (!itemSnap.exists()) {
-              showError("Item not found.");
-              scanningLock = false;
+              showError("Item not found:", itemId);
               return;
           }
 
           const itemData = itemSnap.data();
           let newQuantity = (itemData.quantity || 0) - 1;
 
-          // 2. Update or delete item
           if (newQuantity <= 0) {
+              // Stock depleted, delete the item
               await deleteDoc(itemRef);
-              showNotif(`"${itemData.name}" deleted (0 stock).`);
+              showNotif(`Item "${itemData.name}" deleted, stock reached 0.`);
               playSound(pay);
-              closeQrScanner();
           } else {
+              // Update quantity
               await updateDoc(itemRef, { quantity: newQuantity });
-              playSound(pay);
               showNotif(`Item "${itemData.name}" redeemed!`);
-              closeQrScanner();
+              playSound(pay);
+              console.log(`Item "${itemData.name}" stock reduced to ${newQuantity}.`);
           }
-
-          // 3. Update user's redeemed count
-          const userRedeemRef = doc(db, "users", userId, "redeemedItems", itemId);
-          const userRedeemSnap = await getDoc(userRedeemRef);
-
-          if (userRedeemSnap.exists()) {
-              const oldCount = userRedeemSnap.data().count || 0;
-              await updateDoc(userRedeemRef, {
-                  count: oldCount + 1,
-                  lastRedeemed: Date.now(),
-              });
-          } else {
-              await setDoc(userRedeemRef, {
-                  count: 1,
-                  lastRedeemed: Date.now(),
-              });
-          }
-
       } catch (err) {
-          console.error(err);
-          showError("Error processing QR scan.");
-      } finally {
-          scanningLock = false;
+          showNotif("Error updating item after QR scan:", err);
       }
   }
 
@@ -346,7 +319,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function startQrScan() {
       if (scanningActive) return;
-      scanningLock = true;
 
       scanningActive = true;
       const qrReaderElem = document.getElementById("qr-reader");
@@ -356,7 +328,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       Html5Qrcode.getCameras().then(cameras => {
           if (cameras && cameras.length) {
-              const camId = cameras.find(c => c.label.toLowerCase().includes("back"))?.id || cameras[1].id; // back camera on mobile
+              const camId = cameras[1].id; // back camera on mobile
 
               qrScanner.start(
                   camId,
@@ -364,17 +336,15 @@ document.addEventListener("DOMContentLoaded", () => {
                       fps: 30,
                       qrbox: 300
                   },
-                  (qrMessage) => {
-                      try {
-                          const data = JSON.parse(qrMessage);
-                          //stopQrScan();
-                          handleQrScan(data.itemId, data.userId).finally(() => {
-                              scanningLock = false; // unlock after processing
-                          });
-                      } catch (e) {
-                          scanningLock = false;
-                          showError("Invalid QR code.");
-                      }
+                  (qrCodeMessage) => {
+                    try {
+                        const data = JSON.parse(qrCodeMessage);
+                        handleQrScan(data.itemId);
+                        closeQrScanner();
+                    } catch (e) {
+                        closeQrScanner();
+                        showError("Invalid QR code format.");
+                    }
                   },
               ).catch(err => {
                   showError("QR Start Error:", err);

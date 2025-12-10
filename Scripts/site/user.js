@@ -271,22 +271,43 @@ function openRedeemModal(itemId) {
 }
 
 function listenRedeemedItems(itemId) {
-  if (!auth.currentUser) return;
+  if (!itemId) return;
 
-  const redeemedCol = collection(db, "users", auth.currentUser.uid, "redeemedItems");
-  const q = query(redeemedCol, where("itemId", "==", itemId));
+  const itemRef = doc(db, "items", itemId);
+  let previousQty = null;
 
-  // Listen for changes in real-time
-  const unsubscribe = onSnapshot(q, (snap) => {
-      if (!qrModal.classList.contains("visible")) return;
+  const unsubscribe = onSnapshot(itemRef, (snap) => {
+    if (!qrModal.classList.contains("visible")) {
+      unsubscribe();
+      return;
+    }
 
-      if (!snap.empty) {
-          // At least 1 redeemed entry exists
-          closeRedeemModalWithFX();
-          unsubscribe();
-      }
+    // If item is deleted → stock reached 0
+    if (!snap.exists()) {
+      closeRedeemModalWithFX();
+      unsubscribe();
+      return;
+    }
+
+    const data = snap.data();
+    const qty = data.quantity ?? 0;
+
+    // First snapshot — set baseline
+    if (previousQty === null) {
+      previousQty = qty;
+      return;
+    }
+    // Detect stock decrease
+    if (qty < previousQty) {
+      closeRedeemModalWithFX();
+      unsubscribe();
+      return;
+    }
+    previousQty = qty;
   });
+  return unsubscribe;
 }
+
 
 function closeRedeemModal() {
   qrModal.classList.remove("visible");
@@ -330,7 +351,11 @@ function closeRedeemModalWithFX() {
   qrModal.classList.remove("visible");
   setTimeout(() => {
       qrBackdrop.classList.remove("visible");
-  }, 300);
+  }, 400);
+  setTimeout(() => {
+      const modal1 = document.getElementById("Items-modal");
+      modal1.classList.remove("visible");
+  }, 400);
   modalManager.close([qrModal, qrBackdrop]);
 }
 
