@@ -324,7 +324,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       Html5Qrcode.getCameras().then(cameras => {
           if (cameras && cameras.length) {
-              const camId = cameras[0].id; // back camera on mobile
+              const camId = cameras[1].id; // back camera on mobile
 
               qrScanner.start(
                   camId,
