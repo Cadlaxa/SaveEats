@@ -305,10 +305,12 @@ document.addEventListener("DOMContentLoaded", () => {
               await deleteDoc(itemRef);
               showNotif(`"${itemData.name}" deleted (0 stock).`);
               playSound(pay);
+              closeQrScanner();
           } else {
               await updateDoc(itemRef, { quantity: newQuantity });
               playSound(pay);
               showNotif(`Item "${itemData.name}" redeemed!`);
+              closeQrScanner();
           }
 
           // 3. Update user's redeemed count
@@ -328,7 +330,7 @@ document.addEventListener("DOMContentLoaded", () => {
               });
           }
 
-          closeQrScanner();;
+          closeQrScanner();
 
       } catch (err) {
           console.error(err);
