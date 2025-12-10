@@ -29,6 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const bannerCtx = bannerCanvas.getContext("2d");
   const profileModal = document.getElementById("profile-img-modal");
   const bannerModal = document.getElementById("banner-img-modal");
+  const pay = new Audio("Resources/assets/Apple Pay sound effect.mp3");
 
   let selectedProfileImage = new Image();
   let selectedBannerImage = new Image();
@@ -300,6 +301,8 @@ document.addEventListener("DOMContentLoaded", () => {
           } else {
               // Update quantity
               await updateDoc(itemRef, { quantity: newQuantity });
+              showNotif(`Item "${itemData.name}" redeemed!`);
+              playSound(pay);
               console.log(`Item "${itemData.name}" stock reduced to ${newQuantity}.`);
           }
       } catch (err) {
