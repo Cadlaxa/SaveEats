@@ -330,12 +330,18 @@ document.addEventListener("DOMContentLoaded", () => {
                   camId,
                   {
                       fps: 30,
-                      qrbox: 250
+                      qrbox: 300
                   },
-                  (decodedText) => {
-                      handleQrScan(decodedText);
-                      closeQrScanner();
-                  }
+                  (qrCodeMessage) => {
+                    try {
+                        const data = JSON.parse(qrCodeMessage);
+                        handleQrScan(data.itemId);
+                        closeQrScanner();
+                    } catch (e) {
+                        closeQrScanner();
+                        showError("Invalid QR code format.");
+                    }
+                  },
               ).catch(err => {
                   showError("QR Start Error:", err);
               });
