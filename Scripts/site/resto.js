@@ -298,6 +298,7 @@ document.addEventListener("DOMContentLoaded", () => {
               // Stock depleted, delete the item
               await deleteDoc(itemRef);
               showNotif(`Item "${itemData.name}" deleted, stock reached 0.`);
+              playSound(pay);
           } else {
               // Update quantity
               await updateDoc(itemRef, { quantity: newQuantity });
