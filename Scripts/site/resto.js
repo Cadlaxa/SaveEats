@@ -330,8 +330,6 @@ document.addEventListener("DOMContentLoaded", () => {
               });
           }
 
-          closeQrScanner();
-
       } catch (err) {
           console.error(err);
           showError("Error processing QR scan.");
@@ -348,6 +346,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function startQrScan() {
       if (scanningActive) return;
+      scanningLock = true;
 
       scanningActive = true;
       const qrReaderElem = document.getElementById("qr-reader");
@@ -357,7 +356,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       Html5Qrcode.getCameras().then(cameras => {
           if (cameras && cameras.length) {
-              const camId = cameras[1].id; // back camera on mobile
+              const camId = cameras.find(c => c.label.toLowerCase().includes("back"))?.id || cameras[1].id; // back camera on mobile
 
               qrScanner.start(
                   camId,
@@ -368,8 +367,12 @@ document.addEventListener("DOMContentLoaded", () => {
                   (qrMessage) => {
                       try {
                           const data = JSON.parse(qrMessage);
-                          handleQrScan(data.itemId, data.userId);
+                          stopQrScan();
+                          handleQrScan(data.itemId, data.userId).finally(() => {
+                              scanningLock = false; // unlock after processing
+                          });
                       } catch (e) {
+                          scanningLock = false;
                           showError("Invalid QR code.");
                       }
                   },
