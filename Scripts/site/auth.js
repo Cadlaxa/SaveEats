@@ -168,21 +168,41 @@ document.addEventListener("DOMContentLoaded", () => {
   // ---------------------------
   googleLoginBtn?.addEventListener("click", async () => {
     const provider = new GoogleAuthProvider();
+
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      await setDoc(doc(db, "users", user.uid), {
-        email: user.email,
-        username: user.displayName || "",
-        type: "user"
-      });
+      const userRef = doc(db, "users", user.uid);
+      const snap = await getDoc(userRef);
+
+      if (!snap.exists()) {
+        // First time login → create user document
+        await setDoc(userRef, {
+          email: user.email,
+          username: user.displayName || "",
+          profileImage: user.photoURL || null,
+          type: "user"
+        });
+      } else {
+        // Existing user → DO NOT overwrite saved data
+        await setDoc(
+          userRef, {
+            email: user.email, // update email
+            username: snap.data().username || user.displayName || "",
+            profileImage: snap.data().profileImage || user.photoURL || null
+          }, {
+            merge: true
+          } // keep existing fields
+        );
+      }
 
       showSubmitModalAndRedirect("user");
     } catch (error) {
       showError(error.message);
     }
   });
+
 
   // ---------------------------
   // APPLE LOGIN (AUTO USER)
@@ -196,11 +216,27 @@ document.addEventListener("DOMContentLoaded", () => {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      await setDoc(doc(db, "users", user.uid), {
-        email: user.email,
-        username: user.displayName || "",
-        type: "user"
-      });
+      const userRef = doc(db, "users", user.uid);
+      const snap = await getDoc(userRef);
+
+      if (!snap.exists()) {
+        await setDoc(userRef, {
+          email: user.email,
+          username: user.displayName || "",
+          profileImage: user.photoURL || null,
+          type: "user"
+        });
+      } else {
+        await setDoc(
+          userRef, {
+            email: user.email,
+            username: snap.data().username || user.displayName || "",
+            profileImage: snap.data().profileImage || user.photoURL || null
+          }, {
+            merge: true
+          }
+        );
+      }
 
       showSubmitModalAndRedirect("user");
     } catch (error) {
