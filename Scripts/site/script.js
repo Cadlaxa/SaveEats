@@ -75,40 +75,49 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     MobileCloseButtons.forEach(button => {
-        let startY1 = 0;
-        let endY1 = 0;
+        let startY = 0;
         let moved = false;
 
         button.addEventListener('touchstart', e => {
-            startY1 = e.touches[0].clientY;
-            endY1 = startY1;
+            startY = e.touches[0].clientY;
             moved = false;
-        });
+
+            // Prevent underlying clicks from triggering
+            e.stopPropagation();
+        }, { passive: true });
 
         button.addEventListener('touchmove', e => {
-            endY1 = e.touches[0].clientY;
-            moved = true;
-        });
+            const currentY = e.touches[0].clientY;
+            if (Math.abs(currentY - startY) > 5) {
+                moved = true;
+            }
 
-        button.addEventListener('touchend', () => {
-            const swipeDistance = startY1 - endY1;
+            e.stopPropagation();
+        }, { passive: true });
 
-            // Much more sensitive: only 10px swipe needed
+        button.addEventListener('touchend', e => {
+            const endY = e.changedTouches[0].clientY;
+            const swipeDistance = startY - endY;
+
             const isSwipeUp = moved && swipeDistance > 10;
             const isTap = !moved || Math.abs(swipeDistance) < 5;
 
             if (isSwipeUp || isTap) {
-                const parentModalContainer = button.closest('.modal-container');
-                if (parentModalContainer) {
-                    parentModalContainer.classList.remove('visible');
-                    modalManager.close([parentModalContainer]);
+                const parentModal = button.closest('.modal-container');
+                if (parentModal) {
+                    parentModal.classList.remove('visible');
+                    modalManager.close([parentModal]);
                 }
-                navigator.vibrate([30]);
+                navigator.vibrate?.([30]);
                 toggleModalBtn.style.display = 'none';
                 activeModal = null;
+
+                // Prevent click from propagating to layers below
+                e.preventDefault();
+                e.stopPropagation();
             }
 
-            startY1 = endY1 = 0;
+            startY = 0;
             moved = false;
         });
     });

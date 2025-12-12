@@ -14,6 +14,7 @@ function toggleDarkMode(newState, shouldPlaySound = true, updateCookie = true) {
 
     setTimeout(() => {
         if (newState === "on" && currentMode !== "on") {
+            DarkReader.setFetchMethod(window.fetch);
             DarkReader.enable({ brightness: 140, contrast: 100 });
             toggleIcon.className = "fa-solid fa-sun";
 

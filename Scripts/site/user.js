@@ -273,20 +273,79 @@ document.getElementById("redeemItemBtn").addEventListener("click", () => {
   openRedeemModal(window.currentItem.id);
 });
 
-function openRedeemModal(itemId) {
-  qrModal.classList.add("visible");
-  qrBackdrop.classList.add("visible");
-  listenRedeemedItems(itemId);
-  modalManager.open([qrModal, qrBackdrop]);
-  navigator.vibrate([40])
+async function openRedeemModal(itemId) {
+  try {
+    const itemRef = doc(db, "items", itemId);
+    const itemSnap = await getDoc(itemRef);
+
+    if (!itemSnap.exists()) {
+      showError("This item no longer exists.");
+      return;
+    }
+
+    const item = itemSnap.data();
+    const stock = item.quantity ?? 0;
+
+    // Count active reservations
+    const q = query(
+      collection(db, "reservations"),
+      where("itemId", "==", itemId),
+      where("redeemed", "==", false)
+    );
+    const resSnap = await getDocs(q);
+
+    const reservedCount = resSnap.size;
+
+    // ❌ Already fully reserved
+    if (reservedCount >= stock) {
+      showError("This item is fully reserved. No stock left to redeem.");
+      return;
+    }
+
+    // -----------------------------
+    // Otherwise → OPEN QR MODAL
+    // -----------------------------
+    qrModal.classList.add("visible");
+    qrBackdrop.classList.add("visible");
+    listenRedeemedItems(itemId);
+    modalManager.open([qrModal, qrBackdrop]);
+    navigator.vibrate([40]);
+
+  } catch (err) {
+    showError("Unable to check item availability: " + err.message);
+  }
 }
 
-function openReserveModal(reservationId, itemId) {
-  qrModal.classList.add("visible");
-  qrBackdrop.classList.add("visible");
-  listenReservedRedemptions(reservationId, itemId);
-  modalManager.open([qrModal, qrBackdrop]);
-  navigator.vibrate([40])
+async function openReserveModal(reservationId, itemId) {
+  try {
+    const docRef = doc(db, "reservations", reservationId);
+    const docSnap = await getDoc(docRef);
+
+    if (!docSnap.exists()) {
+      showError("Reservation not found");
+      return;
+    }
+
+    const data = docSnap.data();
+
+    // Check if already redeemed
+    if (data.redeemed) {
+      showNotif("This item has already been redeemed.");
+      return;
+    }
+
+    // If reservation is valid → open modal
+    qrModal.classList.add("visible");
+    qrBackdrop.classList.add("visible");
+    modalManager.open([qrModal, qrBackdrop]);
+    navigator.vibrate([40]);
+
+    // Start the listener for real-time updates
+    listenReservedRedemptions(reservationId, itemId);
+
+  } catch (error) {
+    console.error("Error checking reservation:", error);
+  }
 }
 
 function listenRedeemedItems(itemId) {
@@ -553,6 +612,8 @@ auth.onAuthStateChanged(user => {
 });
 
 const reservedGrid = document.getElementById("reservedGrid");
+const reservationCards = new Map(); // reservationId => {div, unsubscribeItem}
+
 function listenReservedItems(userId) {
   if (!userId) return;
 
@@ -562,74 +623,73 @@ function listenReservedItems(userId) {
     where("redeemed", "==", false)
   );
 
-  onSnapshot(q, async (snap) => {
-    reservedGrid.innerHTML = "";
+  onSnapshot(q, snap => {
+    const newReservationIds = new Set(snap.docs.map(d => d.id));
 
-    if (snap.empty) {
-      reservedGrid.innerHTML = "<p style='text-align:center; padding:20px;'>No reserved items.</p>";
-      return;
-    }
+    // Remove old cards
+    reservationCards.forEach((val, resId) => {
+      if (!newReservationIds.has(resId)) {
+        val.unsubscribeItem?.();
+        val.div.remove();
+        reservationCards.delete(resId);
+      }
+    });
 
-    for (const docSnap of snap.docs) {
-      const reservation = docSnap.data();
-      reservation.id = docSnap.id;
+    // Add/update reservations
+    snap.docs.forEach(docSnap => {
+      const reservation = { ...docSnap.data(), id: docSnap.id };
 
-      // Fetch the item data to show image/details
-      const itemRef = doc(db, "items", reservation.itemId);
-      const itemSnap = await getDoc(itemRef);
-      const item = itemSnap.exists() ? itemSnap.data() : {};
+      if (!reservationCards.has(reservation.id)) {
+        const div = document.createElement("div");
+        div.className = "item-card";
+        reservedGrid.appendChild(div);
 
-      const div = document.createElement("div");
-      div.className = "item-card";
+        // Listen to item document in realtime
+        const itemRef = doc(db, "items", reservation.itemId);
+        const unsubscribeItem = onSnapshot(itemRef, itemSnap => {
+          const item = itemSnap.exists() ? itemSnap.data() : {};
 
-      div.innerHTML = `
-        <img src="${item.imageBase64 || 'assets/default-food.png'}" class="item-image">
-        <div class="item-details">
-          <h3>${reservation.name}</h3>
-
-          <div class="bottom-row">
-            <div class="price-row">
-              <span class="original-price">₱${item.originalPrice ?? 'N/A'}</span>
-              <span class="discounted-price">₱${item.discountedPrice ?? 'N/A'}</span>
+          div.innerHTML = `
+            <img src="${item.imageBase64 || 'assets/default-food.png'}" class="item-image">
+            <div class="item-details">
+              <h3>${item.name || reservation.name}</h3>
+              <div class="bottom-row">
+                <div class="price-row">
+                  <span class="original-price">₱${item.originalPrice ?? 'N/A'}</span>
+                  <span class="discounted-price">₱${item.discountedPrice ?? 'N/A'}</span>
+                </div>
+                <p>Reserved At: ${reservation.reservedAt?.toDate ? reservation.reservedAt.toDate().toLocaleString() : new Date(reservation.reservedAt).toLocaleString()}</p>
+                <div class="item-actions">
+                  <button class="redeem-btn">Redeem</button>
+                </div>
+              </div>
             </div>
-            <p>Reserved At: ${reservation.reservedAt?.toDate ? reservation.reservedAt.toDate().toLocaleString() : new Date(reservation.reservedAt).toLocaleString()}</p>
-            <div class="item-actions">
-              <button class="redeem-btn">Redeem</button>
-            </div>
-          </div>
-        </div>
-      `;
+          `;
 
-      const redeemBtn = div.querySelector(".redeem-btn");
-      redeemBtn.addEventListener("click", () => {
-        const canvas = document.getElementById("qrCanvas");
-        const user = auth.currentUser;
+          const redeemBtn = div.querySelector(".redeem-btn");
+          redeemBtn.onclick = () => {
+            const canvas = document.getElementById("qrCanvas");
+            const user = auth.currentUser;
 
-        // QR content using this reservation/item
-        const qrData = JSON.stringify({
-          itemId: reservation.itemId,
-          reservationId: reservation.id,
-          userId: user ? user.uid : "guest",
-          time: Date.now()
+            const qrData = JSON.stringify({
+              itemId: reservation.itemId,
+              reservationId: reservation.id,
+              userId: user ? user.uid : "guest",
+              time: Date.now()
+            });
+
+            const ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            QRCode.toCanvas(canvas, qrData, { width: 220 }, error => { if (error) console.error(error); });
+
+            openReserveModal(reservation.id, reservation.itemId);
+          };
         });
 
-        // Clear previous QR
-        const ctx = canvas.getContext("2d");
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        reservationCards.set(reservation.id, { div, unsubscribeItem });
+      }
+    });
 
-        // Generate QR
-        QRCode.toCanvas(canvas, qrData, { width: 220 }, function (error) {
-          if (error) console.error(error);
-        });
-
-        // Show modal
-        openReserveModal(reservation.id, reservation.itemId);
-      });
-
-      reservedGrid.appendChild(div);
-    }
-
-    // Re-attach hover/click sounds only once
     if (window.attachHoverListeners) window.attachHoverListeners();
   });
 }

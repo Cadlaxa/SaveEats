@@ -299,16 +299,12 @@ async function openReservationModal(itemId) {
 // -------------------------------
 window.deleteItem = async function(id) {
   try {
-    // Delete the item
-    await deleteDoc(doc(db, "items", id));
-
-    // Delete all active reservations for this item
+    // 1. Get active reservations
     const reservationsQuery = query(
       collection(db, "reservations"),
       where("itemId", "==", id),
       where("redeemed", "==", false)
     );
-
     const reservationsSnap = await getDocs(reservationsQuery);
     const batch = writeBatch(db);
 
@@ -316,14 +312,24 @@ window.deleteItem = async function(id) {
       batch.delete(doc(db, "reservations", docSnap.id));
     });
 
+    // Commit reservation deletions first
     await batch.commit();
 
-    showNotif("Item and related reservations deleted successfully!");
+    // 2. Unsubscribe any listeners for this item before deleting it
+    if (window.itemListeners && window.itemListeners[id]) {
+      window.itemListeners[id].forEach(unsub => unsub());
+      delete window.itemListeners[id];
+    }
+
+    // 3. Delete the item
+    await deleteDoc(doc(db, "items", id));
+
+    showNotif("Item deleted successfully!");
   } catch (err) {
     console.error(err);
     showError("Failed to delete item: " + err.message);
   }
-}
+};
 
 // -------------------------------
 // EDIT ITEM
