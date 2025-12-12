@@ -8,7 +8,8 @@ import {
   setDoc,
   getDoc,
   doc,
-  updateDoc
+  updateDoc,
+  increment
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 window.addEventListener("load", loadRestaurants);
@@ -280,10 +281,10 @@ function openRedeemModal(itemId) {
   navigator.vibrate([40])
 }
 
-function openReserveModal(itemId) {
+function openReserveModal(reservationId, itemId) {
   qrModal.classList.add("visible");
   qrBackdrop.classList.add("visible");
-  listenReservedRedemptions(itemId);
+  listenReservedRedemptions(reservationId, itemId);
   modalManager.open([qrModal, qrBackdrop]);
   navigator.vibrate([40])
 }
@@ -341,50 +342,43 @@ function listenReservedRedemptions(reservationId, itemId) {
     }
 
     if (!itemSnap.exists()) {
-      // Item deleted → close modal
       closeRedeemModalWithFX();
       unsubscribeItem();
       return;
     }
 
-    const itemData = itemSnap.data();
-    const currentQty = itemData.quantity ?? 0;
+    const currentQty = itemSnap.data().quantity ?? 0;
 
-    // Set baseline on first snapshot
     if (previousQty === null) {
       previousQty = currentQty;
       return;
     }
 
-    // Detect stock decrease
+    // Stock decreased → redeemed
     if (currentQty < previousQty) {
       closeRedeemModalWithFX();
       unsubscribeItem();
-      return;
     }
 
     previousQty = currentQty;
   });
 
-  const unsubscribeReservation = onSnapshot(reservationRef, (resSnap) => {
+  const unsubscribeReservation = onSnapshot(reservationRef, async (resSnap) => {
     if (!qrModal.classList.contains("visible")) {
       unsubscribeReservation();
       return;
     }
 
     if (!resSnap.exists() || resSnap.data().redeemed) {
-      // Reservation was deleted or redeemed → close modal
       closeRedeemModalWithFX();
 
-      // Optionally decrement the item quantity if redeemed
       if (resSnap.exists() && resSnap.data().redeemed) {
-        update(itemRef, {
-          quantity: FieldValue.increment(-1)
-        }).catch(console.error);
+        await updateDoc(itemRef, {
+          quantity: increment(-1)
+        });
       }
 
       unsubscribeReservation();
-      return;
     }
   });
 
@@ -578,6 +572,7 @@ function listenReservedItems(userId) {
 
     for (const docSnap of snap.docs) {
       const reservation = docSnap.data();
+      reservation.id = docSnap.id;
 
       // Fetch the item data to show image/details
       const itemRef = doc(db, "items", reservation.itemId);
@@ -613,6 +608,7 @@ function listenReservedItems(userId) {
         // QR content using this reservation/item
         const qrData = JSON.stringify({
           itemId: reservation.itemId,
+          reservationId: reservation.id,
           userId: user ? user.uid : "guest",
           time: Date.now()
         });
@@ -627,7 +623,7 @@ function listenReservedItems(userId) {
         });
 
         // Show modal
-        openReserveModal(reservation.itemId);
+        openReserveModal(reservation.id, reservation.itemId);
       });
 
       reservedGrid.appendChild(div);
