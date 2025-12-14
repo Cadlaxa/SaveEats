@@ -6,6 +6,12 @@
   transition: 0.2s ease-in-out, 0.2s ease-in-out;
 }
 
+.anton-regular {
+  font-family: "Anton", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
 body {
   user-select: none;
   -webkit-user-select: none;
@@ -2344,7 +2350,7 @@ html {
 }
 
 .home-hero h2 {
-  font-family: 'Anton', Impact, Haettenschweiler, 'Arial Black', sans-serif;
+  font-family: "Anton", sans-serif;
   font-size: 4rem;
   font-weight: 900;
   color: var(--ptext);
