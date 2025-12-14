@@ -603,9 +603,10 @@ document.getElementById("saveProfileImage").addEventListener("click", async () =
 
   try {
     // 🚨 ONLY export canvas if image is local
-    if (imageSource === "local") {
+    /*if (imageSource === "local") {
       updateData.profileImage = cropCanvas.toDataURL("image/jpeg", 0.9);
-    }
+    }*/
+    updateData.profileImage = cropCanvas.toDataURL("image/jpeg", 0.9);
 
     await updateDoc(doc(db, "users", user.uid), updateData);
     profileImgModal.classList.remove("visible");

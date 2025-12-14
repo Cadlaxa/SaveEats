@@ -397,8 +397,10 @@ function HSLToHex(h, s, l, a = 1) {
 }
 
 function isRestoDashboard() {
-    return window.location.pathname.includes("resto-dashboard.html");
+  const path = window.location.pathname;
+  return path.includes("resto-dashboard.html") || path.includes("resto-dashboard");
 }
+
 async function saveThemeToFirestore(themeName, hueValue) {
     if (!isRestoDashboard()) return;
 
