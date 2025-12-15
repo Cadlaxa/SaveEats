@@ -2023,6 +2023,8 @@ html {
   padding-right: 15px;
   display: flex;
   flex-direction: column;
+  margin-top: 10px;
+
 }
 
 .bottom-row1 {
@@ -2499,8 +2501,8 @@ html {
 
   .items-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(130px, auto));
-    justify-content: start;
+    grid-template-columns: repeat(auto-fill, minmax(180px, auto));
+    justify-content: center;
     gap: 16px;
     margin-top: 20px;
   }
@@ -2508,8 +2510,8 @@ html {
   .item-details p {
     margin-top: 10px;
     font-size: 12px;
-    margin-bottom: 10px;
     line-height: 15px;
+    display: none;
   }
 
   .item-details h3 {

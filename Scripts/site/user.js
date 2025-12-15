@@ -179,7 +179,7 @@ function renderItems() {
             <span class="original-price">₱${item.originalPrice}</span>
             <span class="discounted-price">₱${item.discountedPrice}</span>
           </div>
-          <p>Stock: ${item.quantity}</p>
+          <p>${item.quantity} left</p>
           <b>Expires: ${expireStr}</b>
         </div>
 
