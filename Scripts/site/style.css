@@ -2564,7 +2564,6 @@ html {
   }
 
   .home-hero h2 {
-    font-family: Impact, Haettenschweiler, 'Arial Black', sans-serif;
     font-size: 3.3rem;
     font-weight: 900;
     color: var(--ptext);
@@ -3063,7 +3062,6 @@ html {
   }
 
   .home-hero h2 {
-    font-family: Impact, Haettenschweiler, 'Arial Black', sans-serif;
     font-size: 2.6rem;
     font-weight: 900;
     color: var(--ptext);
