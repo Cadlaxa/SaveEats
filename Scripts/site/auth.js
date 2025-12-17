@@ -128,14 +128,26 @@ document.addEventListener("DOMContentLoaded", () => {
   onAuthStateChanged(auth, async (user) => {
     if (!user) return;
 
-    // Skip auto redirect right after redirect login
-    if (localStorage.getItem("justRedirected")) {
-      localStorage.removeItem("justRedirected");
-      return;
+    let currentUser = user;
+    // Only check redirect result once per page load
+    const justRedirected = localStorage.getItem("justRedirected");
+
+    if (isIOS() && !justRedirected) {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result?.user) currentUser = result.user;
+        // Mark as handled so we don't redirect again
+        localStorage.setItem("justRedirected", "true");
+      } catch { /* ignore */ }
     }
 
+    await writeOrUpdateUserProfile(currentUser);
+
     try {
-      const snap = await getDoc(doc(db, "users", user.uid));
+      // Skip redirect if we already redirected
+      if (localStorage.getItem("redirected")) return;
+
+      const snap = await getDoc(doc(db, "users", currentUser.uid));
       if (!snap.exists()) return;
 
       const type = snap.data().type || "user";
@@ -148,6 +160,7 @@ document.addEventListener("DOMContentLoaded", () => {
         page === "sign-up.html" ||
         page === "sign-up-resto.html"
       ) {
+        localStorage.setItem("redirected", "true");
         window.location.href =
           type === "restaurant"
             ? "resto-dashboard.html"

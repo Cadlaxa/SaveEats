@@ -217,35 +217,29 @@ function renderItems() {
 
     onSnapshot(q, async (snap) => {
       previewContainer.innerHTML = "";
+    const docs = snap.docs.slice(0, 5);
 
-      const docs = snap.docs.slice(0, 5);
+    for (const docSnap of docs) {
+      const reservation = docSnap.data();
+      const userRef = doc(db, "users", reservation.userId);
+      const userSnap = await getDoc(userRef);
+      const userData = userSnap.exists() ? userSnap.data() : {};
 
-      for (const docSnap of docs) {
-        const reservation = docSnap.data();
+      const dot = document.createElement("img");
+      dot.className = "reservation-dot";
+      dot.title = userData.username || "User";
 
-        let profileSrc = "Resources/assets/profile.jpg";
-
-        try {
-          if (reservation.userId === auth.currentUser?.uid && auth.currentUser.photoURL) {
-            profileSrc = auth.currentUser.photoURL;
-          } else {
-            const userSnap = await getDoc(doc(db, "users", reservation.userId));
-            if (userSnap.exists() && userSnap.data().profileImage) {
-              profileSrc = userSnap.data().profileImage;
-            }
-          }
-        } catch (e) {
-          console.warn("Failed to load profile image", e);
-        }
-
-        const dot = document.createElement("img");
-        dot.className = "reservation-dot";
-        dot.src = profileSrc;
-        dot.title = reservation.userId;
-
-        previewContainer.appendChild(dot);
+      // Priority: Firestore photo → current logged-in auth photo if same user → fallback
+      let profileSrc = "Resources/assets/profile.jpg"; // default fallback
+      if (userData.profileImage) {
+        profileSrc = userData.profileImage;
+      } else if (auth.currentUser && auth.currentUser.uid === reservation.userId && auth.currentUser.photoURL) {
+        profileSrc = auth.currentUser.photoURL;
       }
 
+      dot.src = profileSrc;
+      previewContainer.appendChild(dot);
+    }
       // +N indicator
       if (snap.docs.length > 5) {
         const more = document.createElement("span");
