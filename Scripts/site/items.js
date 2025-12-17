@@ -182,9 +182,9 @@ function createItemElement(id, item) {
       <button onclick="deleteItem('${id}')">Delete</button>
     </div>
   `;
-    div.addEventListener("click", () => {
+    /*div.addEventListener("click", () => {
       editItem(id);
-    });
+    });*/
    
   // Re-attach hover/click sounds only once
   if (window.attachHoverListeners) {
@@ -337,6 +337,14 @@ window.deleteItem = async function(id) {
 // -------------------------------
 // EDIT ITEM
 // -------------------------------
+
+function toLocalInputValue(date) {
+  const pad = n => String(n).padStart(2, "0");
+
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}` +
+         `T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
 let originalExpiry = null;
 window.editItem = async function(id) {
   try {
@@ -349,13 +357,37 @@ window.editItem = async function(id) {
     itemsModal.classList.add("visible");
     document.querySelector(".window-title").textContent = "Edit Item";
 
+    if (item.expiryTime) {
+      originalExpiry = item.expiryTime.toDate
+        ? item.expiryTime.toDate()
+        : new Date(item.expiryTime);
+
+      itemExpiry.value = toLocalInputValue(originalExpiry);
+    } else {
+      itemExpiry.value = "";
+    }
+
+    itemExpiry.addEventListener("click", () => {
+      if (itemExpiry.showPicker) {
+        itemExpiry.showPicker();
+      }
+    });
+
+    itemExpiry.addEventListener("focus", () => {
+      if (itemExpiry.value) {
+        const v = itemExpiry.value;
+        itemExpiry.value = "";
+        itemExpiry.value = v;
+      }
+    });
+
     itemName.value = item.name;
     itemDescription.value = item.description || "";
     itemOriginalPrice.value = item.originalPrice;
     itemDiscountedPrice.value = item.discountedPrice;
     itemQuantity.value = item.quantity;
     //itemExpiry.value = item.expiryTime ? new Date(item.expiryTime.toDate ? item.expiryTime.toDate() : item.expiryTime).toISOString().slice(0,16) : "";
-    originalExpiry = item.expiryTime ?? null;
+    //originalExpiry = expireStr ?? null;
 
     itemPreviewImage.src = item.imageBase64 || "Resources/assets/food.png";
     selectedItemImage.src = item.imageBase64 || "";
@@ -387,6 +419,7 @@ async function saveItem(e) {
   const discountedPrice = Number(itemDiscountedPrice.value);
   const quantity = Number(itemQuantity.value);
   let expiryTime = null;
+
   if (!currentEditId) {
       // Add Mode
       expiryTime = itemExpiry.value ? new Date(itemExpiry.value) : null;

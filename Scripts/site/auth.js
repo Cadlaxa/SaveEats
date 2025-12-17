@@ -345,18 +345,19 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* ---------------- PASSWORD TOGGLE ---------------- */
-  const passwordInput = document.getElementById("login-password");
-  const togglePassword = document.getElementById("togglePassword");
-  const toggleIcon = togglePassword.querySelector("i");
+  document.querySelectorAll(".toggle-password").forEach(toggle => {
+    toggle.addEventListener("click", () => {
+      const wrapper = toggle.closest(".password-wrapper");
+      const input = wrapper.querySelector("input");
+      const icon = toggle.querySelector("i");
 
-  togglePassword.addEventListener("click", () => {
-    // Toggle input type
-    const type = passwordInput.type === "password" ? "text" : "password";
-    passwordInput.type = type;
+      // Toggle password visibility
+      input.type = input.type === "password" ? "text" : "password";
 
-    // Toggle icon
-    toggleIcon.classList.toggle("fa-eye");
-    toggleIcon.classList.toggle("fa-eye-slash");
+      // Toggle icon
+      icon.classList.toggle("fa-eye");
+      icon.classList.toggle("fa-eye-slash");
+    });
   });
 
 });

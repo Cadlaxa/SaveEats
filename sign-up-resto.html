@@ -161,7 +161,7 @@
 
             <div class="window-content">
                 <div class="intro-section">
-                    <h2><span class="cad-name-special">Creating...</span></h2>
+                    <h2><span class="cad-name-special">Cooking...</span></h2>
                     <p>Please enter your details to create your Resto Account</p>
                 </div>
                 <div class="login-section">
@@ -169,8 +169,21 @@
                         <div class="form-grid1">
                             <input type="username" id="restoname" placeholder="Restaurant name" required>
                             <input type="email" id="resto-email" placeholder="Email address" required>
-                            <input type="password" id="resto-password" placeholder="Password" required>
-                            <input type="password" id="resto-password_rep" placeholder="Repeat your Password" required>
+                            
+                            <div class="password-wrapper">
+                              <input type="password" id="resto-password" placeholder="Password" required>
+                              <span class="toggle-password">
+                                <i class="fa-solid fa-eye-slash"></i>
+                              </span>
+                            </div>
+
+                            <div class="password-wrapper">
+                              <input type="password" id="resto-password_rep" placeholder="Repeat your Password" required>
+                              <span class="toggle-password">
+                                <i class="fa-solid fa-eye-slash"></i>
+                              </span>
+                            </div>
+
                         </div>
 
                         <div class="form-grid2">

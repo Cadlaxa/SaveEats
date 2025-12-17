@@ -2153,7 +2153,7 @@ html {
   color: white;
   font-weight: 600;
   font-size: medium;
-  padding: 5px 10px;
+  padding: 8px 10px;
   border-radius: 10px;
   cursor: pointer;
   transition: background 0.2s ease;
@@ -2697,7 +2697,6 @@ html {
     font-size: 15px;
     font-weight: 600;
     font-size: medium;
-    padding: 5px 5px;
     border-radius: var(--radius-inner);
     
   }

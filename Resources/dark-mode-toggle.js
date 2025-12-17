@@ -2,89 +2,84 @@ const darkModeSound = new Audio("Resources/sfx/darkmode.mp3");
 const lightModeSound = new Audio("Resources/sfx/lightmode.mp3");
 
 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
-const prefersLight = window.matchMedia('(prefers-color-scheme: light)'); 
-
 let currentMode = null;
 
-function toggleDarkMode(newState, shouldPlaySound = true, updateCookie = true) {
-    const toggleIcon = document.querySelector(".dark-mode-toggle i");
-
-    // Trigger animation class
-    toggleIcon.classList.add("switching");
-
-    setTimeout(() => {
-        if (newState === "on" && currentMode !== "on") {
-            DarkReader.setFetchMethod(window.fetch);
-            DarkReader.enable({ brightness: 140, contrast: 100 });
-            toggleIcon.className = "fa-solid fa-sun";
-
-            if (shouldPlaySound) {
-                playSound(darkModeSound);
-            }
-            if (updateCookie) setCookie("darkmode", "on", 9999);
-            //tryShowModalMessage('dark');
-            currentMode = "on";
-        } 
-        else if (newState === "off" && currentMode !== "off") {
-            DarkReader.disable();
-            toggleIcon.className = "fa-solid fa-moon";
-
-            if (shouldPlaySound) {
-                playSound(lightModeSound);
-            }
-            if (updateCookie) setCookie("darkmode", "off", 9999);
-            //tryShowModalMessage('light');
-            currentMode = "off";
-        }
-
-        toggleIcon.classList.remove("switching");
-    }, 300);
-}
-
-
-document.querySelector(".dark-mode-toggle").addEventListener("click", function () {
-    const darkreaderActive = document.querySelector(".darkreader");
-    toggleDarkMode(darkreaderActive ? "off" : "on");
-}, false);
-
+/* ------------------------------
+   COOKIE HELPERS
+------------------------------ */
 function setCookie(cname, cvalue, exdays) {
     const d = new Date();
-    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+    d.setTime(d.getTime() + exdays * 24 * 60 * 60 * 1000);
     document.cookie = `${cname}=${cvalue};expires=${d.toUTCString()};path=/`;
 }
 
 function getCookie(cname) {
     const name = cname + "=";
-    return document.cookie.split(';').map(c => c.trim()).find(c => c.startsWith(name))?.substring(name.length) || "";
+    return document.cookie
+        .split(";")
+        .map(c => c.trim())
+        .find(c => c.startsWith(name))
+        ?.slice(name.length) || "";
 }
 
-window.addEventListener("load", function () {
-    const darkModeCookie = getCookie("darkmode");
+/* ------------------------------
+   DARK MODE TOGGLE
+------------------------------ */
+function toggleDarkMode(newState, shouldPlaySound = true, updateCookie = true) {
+    if (currentMode === newState) return;
 
-    if (prefersDark.matches) {
-        // Device prefers dark
-        if (darkModeCookie !== "on") {
-            toggleDarkMode("on", false, true); // force dark + update cookie
+    const toggleIcon = document.querySelector(".dark-mode-toggle i");
+    toggleIcon.classList.add("switching");
+
+    setTimeout(() => {
+        if (newState === "on") {
+            DarkReader.setFetchMethod(window.fetch);
+            DarkReader.enable({ brightness: 140, contrast: 100 });
+            toggleIcon.className = "fa-solid fa-sun";
+            if (shouldPlaySound) playSound(darkModeSound);
         } else {
-            toggleDarkMode("on", false, false); // already correct, no cookie overwrite
+            DarkReader.disable();
+            toggleIcon.className = "fa-solid fa-moon";
+            if (shouldPlaySound) playSound(lightModeSound);
         }
-    } else if (prefersLight.matches) {
-        // Device prefers light
-        if (darkModeCookie !== "off") {
-            toggleDarkMode("off", false, true); // force light + update cookie
-        } else {
-            toggleDarkMode("off", false, false);
+
+        if (updateCookie) {
+            setCookie("darkmode", newState, 9999);
         }
+
+        currentMode = newState;
+        toggleIcon.classList.remove("switching");
+    }, 300);
+}
+
+/* ------------------------------
+   CLICK HANDLER
+------------------------------ */
+document.querySelector(".dark-mode-toggle").addEventListener("click", () => {
+    toggleDarkMode(currentMode === "on" ? "off" : "on");
+});
+
+/* ------------------------------
+   INITIAL LOAD (COOKIE FIRST)
+------------------------------ */
+window.addEventListener("load", () => {
+    const cookieMode = getCookie("darkmode");
+
+    if (cookieMode === "on" || cookieMode === "off") {
+        // User preference ALWAYS wins
+        toggleDarkMode(cookieMode, false, false);
     } else {
-        // fallback if system doesn’t specify, default to light
-        toggleDarkMode(darkModeCookie === "on" ? "on" : "off", false, darkModeCookie === "");
+        // No cookie → use system preference
+        toggleDarkMode(prefersDark.matches ? "on" : "off", false, true);
     }
-}, false);
+});
 
-if (window.matchMedia) {
-    prefersDark.addEventListener("change", (e) => {
-        const systemPref = e.matches ? "on" : "off";
-        toggleDarkMode(systemPref, true, true); // always update cookie when system changes
-    });
-}
-
+/* ------------------------------
+   SYSTEM CHANGE (ONLY IF NO COOKIE)
+------------------------------ */
+prefersDark.addEventListener("change", (e) => {
+    const cookieMode = getCookie("darkmode");
+    if (!cookieMode) {
+        toggleDarkMode(e.matches ? "on" : "off", false, true);
+    }
+});
