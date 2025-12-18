@@ -153,21 +153,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- Floating Button Toggle Functionality ---
-    toggleModalBtn.addEventListener('click', () => {
-        if (activeModal) {
-            activeModal.classList.toggle('visible');
-            const icon = toggleModalBtn.querySelector('i');
-            if (activeModal.classList.contains('visible')) {
-                icon.classList.remove('fa-square-plus');
-                icon.classList.add('fa-square-minus');
-            } else {
-                icon.classList.remove('fa-square-minus');
-                icon.classList.add('fa-square-plus');
-            }
-        }
-    });
-
     // --- Draggable Window Functionality ---
     let activeDraggable = null;
     let initialX, initialY;
