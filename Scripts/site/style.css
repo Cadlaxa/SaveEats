@@ -3226,4 +3226,8 @@ html {
     overflow-y: auto;
     border-radius: var(--radius);
   }
+
+  .window-container {
+    margin-bottom: 8vh;
+  }
 }
