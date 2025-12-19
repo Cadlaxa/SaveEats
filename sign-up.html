@@ -212,6 +212,42 @@
         </div>
     </div>
 
+  <!-- CONTACTS -->
+  <div id="contact-modal" class="modal-container">
+    <div class="modal-window">
+      <div class="modal-window-base modal-small2">
+        <div class="window-header handle">
+          <span class="window-title">Register your Resto Identity first</span>
+          <button class="close-btn">&times;</button>
+        </div>
+        <div class="modal-content ">
+          <div class="profile-container">
+            <div class="profile-header">
+              <div class="profile-name">
+                <h1><span class="cad-name">Validation</span></h1>
+              </div>
+            </div>
+          </div>
+          <div class="about-section">
+              <p>email: <a href="mailto:saveeats.mail@gmail.com" class="cad-name">saveeats.mail@gmail.com</a></p>
+              <form id="contact-form">
+                <div class="contact-grid">
+                  <input type="text" name="name" placeholder="Your name" required />
+                  <input type="email" name="email" placeholder="Your gmail account" required />
+                  <input type="text" name="subject" placeholder="Resto name" required />
+                  <textarea name="message" placeholder="About your resto/eatery here, location, page/social media etc..." required></textarea>
+                </div>
+              </form>
+              <div class="form-grid">
+                <button type="submit" id="email-submit-btn" class="submit-btn">Submit</button>
+              </div>
+          </div>
+        </div>
+      </div>
+      <div class="nav-bar"></div>
+    </div>
+  </div>
+
     <!-- Submitted card -->
   <div id="submit-modal" class="modal-container">
     <div class="modal-window">
@@ -291,6 +327,8 @@
   </div>
 
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script src="resources/email-submit.js"></script>
   <script src="Scripts/site/script.js"></script>
   <script src="Resources/dark-mode-toggle.js"></script>
   <script src="Resources/clicks.js"></script>

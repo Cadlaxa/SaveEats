@@ -35,6 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const googleLoginBtn = document.getElementById("googleLoginBtn");
   const appleLoginBtn = document.getElementById("appleLoginBtn");
+  const emailModal = document.getElementById("contact-modal");
 
   const isIOS = () =>
     /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
@@ -306,7 +307,7 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ---------------- RESTO SIGN UP ---------------- */
 
   restoBtn1?.addEventListener("click", () =>
-    window.location.href = "sign-up-resto.html"
+    emailModal.classList.add("visible")
   );
 
   restoBtn?.addEventListener("click", async () => {
