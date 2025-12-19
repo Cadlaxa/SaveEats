@@ -184,32 +184,45 @@ function renderItems() {
           : item.description)
       : "No item description";
 
+    // Check availability, default true if missing
+    const isAvailable = item.available !== undefined ? item.available : true;
+
     card.innerHTML = `
-      <div class="item-image-wrapper">
-        <img src="${item.imageBase64 || 'assets/default-food.png'}" class="item-image">
+      <div class="item-image-wrapper" style="position: relative;">
+        <img src="${item.imageBase64 || 'assets/default-food.png'}" class="item-image" style="${!isAvailable ? 'filter: grayscale(100%); opacity: 0.6;' : ''}">
         <img src="${item.imageBase64 || 'assets/default-food.png'}" class="item-image-bg">
+        ${!isAvailable ? `<div class="unavailable-overlay">UNAVAILABLE</div>` : ''}
         <div class="reservation-preview" id="reservationPreview-${item.id}"></div>
-        
         <div class="price-img">
             <span class="discounted-price">₱${item.discountedPrice}</span>
         </div>
       </div>
       <div class="item-details">
-        <h3>${item.name}</h3>
+        <h3 class="${!isAvailable ? "unavailable" : ""}">
+          ${item.name} ${!isAvailable ? "" : ""}
+        </h3>
 
         <div class="bottom-row">
           <div class="price-row">
             <span class="original-price">₱${item.originalPrice}</span>
             <b>${item.quantity} left</b>
           </div>
-          
           <b>Expires: ${expireStr}</b>
         </div>
-
       </div>
     `;
-  
+
+    // Apply strike-through style if unavailable
+    if (!isAvailable) {
+      const h3 = card.querySelector("h3.unavailable");
+      if (h3) {
+        h3.style.textDecoration = "line-through";
+        h3.style.color = "var(--dark-orange)";
+      }
+    }
+
     itemsGrid.appendChild(card);
+
     requestAnimationFrame(() => {
       card.style.transitionDelay = `${index * 60}ms`;
       card.getBoundingClientRect();
@@ -219,7 +232,13 @@ function renderItems() {
       }, index * 60 + 500);
     });
 
-    card.addEventListener("click", () => openUserItemModal(item));
+    card.addEventListener("click", () => {
+        if (!isAvailable) {
+            showNotif("This item is unavailable :(");
+            return;
+        }
+        openUserItemModal(item);
+    });
 
     // Reservation dots overlay
     const previewId = `reservationPreview-${item.id}`;
@@ -235,30 +254,29 @@ function renderItems() {
 
     onSnapshot(q, async (snap) => {
       previewContainer.innerHTML = "";
-    const docs = snap.docs.slice(0, 5);
+      const docs = snap.docs.slice(0, 5);
 
-    for (const docSnap of docs) {
-      const reservation = docSnap.data();
-      const userRef = doc(db, "users", reservation.userId);
-      const userSnap = await getDoc(userRef);
-      const userData = userSnap.exists() ? userSnap.data() : {};
+      for (const docSnap of docs) {
+        const reservation = docSnap.data();
+        const userRef = doc(db, "users", reservation.userId);
+        const userSnap = await getDoc(userRef);
+        const userData = userSnap.exists() ? userSnap.data() : {};
 
-      const dot = document.createElement("img");
-      dot.className = "reservation-dot";
-      dot.title = userData.username || "User";
+        const dot = document.createElement("img");
+        dot.className = "reservation-dot";
+        dot.title = userData.username || "User";
 
-      // Priority: Firestore photo → current logged-in auth photo if same user → fallback
-      let profileSrc = "Resources/assets/profile.jpg"; // default fallback
-      if (userData.profileImage) {
-        profileSrc = userData.profileImage;
-      } else if (auth.currentUser && auth.currentUser.uid === reservation.userId && auth.currentUser.photoURL) {
-        profileSrc = auth.currentUser.photoURL;
+        let profileSrc = "Resources/assets/profile.jpg";
+        if (userData.profileImage) {
+          profileSrc = userData.profileImage;
+        } else if (auth.currentUser && auth.currentUser.uid === reservation.userId && auth.currentUser.photoURL) {
+          profileSrc = auth.currentUser.photoURL;
+        }
+
+        dot.src = profileSrc;
+        previewContainer.appendChild(dot);
       }
 
-      dot.src = profileSrc;
-      previewContainer.appendChild(dot);
-    }
-      // +N indicator
       if (snap.docs.length > 5) {
         const more = document.createElement("span");
         more.className = "reservation-dot-more";
@@ -813,7 +831,6 @@ function listenReservedItems(userId) {
         : tB - tA;
     });
 
-    // Add/update reservations
     sortedDocs.forEach((docSnap, index) => {
       const reservation = { ...docSnap.data(), id: docSnap.id };
 
@@ -843,17 +860,20 @@ function listenReservedItems(userId) {
         const unsubscribeItem = onSnapshot(itemRef, itemSnap => {
           const item = itemSnap.exists() ? itemSnap.data() : {};
 
+          const isAvailable = item.available !== false; // treat undefined as true
+
           div.innerHTML = `
-            <div class="item-image-wrapper">
-              <img src="${item.imageBase64 || 'assets/default-food.png'}" class="item-image">
+            <div class="item-image-wrapper" style="position: relative;">
+              <img src="${item.imageBase64 || 'assets/default-food.png'}" class="item-image" style="${!isAvailable ? 'filter: grayscale(80%); opacity: 0.6;' : ''}">
               <img src="${item.imageBase64 || 'assets/default-food.png'}" class="item-image-bg">
-              
+              ${!isAvailable ? '<div class="unavailable-overlay">UNAVAILABLE</div>' : ''}
+
               <div class="price-img">
                   <span class="discounted-price">₱${item.discountedPrice}</span>
               </div>
             </div>
             <div class="item-details">
-              <h3>${item.name}</h3>
+              <h3 style="${!isAvailable ? 'text-decoration: line-through;' : ''}">${item.name}</h3>
 
               <div class="bottom-row">
                 <div class="price-row">
@@ -863,7 +883,6 @@ function listenReservedItems(userId) {
                 
                 <b>Reserved At: ${reservation.reservedAt?.toDate ? reservation.reservedAt.toDate().toLocaleString() : new Date(reservation.reservedAt).toLocaleString()}</b>
               </div>
-
             </div>
 
             <div class="item-actions">
@@ -874,6 +893,11 @@ function listenReservedItems(userId) {
 
           const redeemBtn = div.querySelector(".redeem-btn");
           redeemBtn.onclick = () => {
+            if (!isAvailable) {
+              showNotif("This item is unavailable, you cannot redeem it, sorry :(");
+              return;
+            }
+
             const canvas = document.getElementById("qrCanvas");
             const user = auth.currentUser;
 
@@ -895,7 +919,6 @@ function listenReservedItems(userId) {
           cancelBtn.onclick = async () => {
             try {
               await deleteDoc(doc(db, "reservations", reservation.id));
-              // UI auto-updates via onSnapshot
               showNotif("Reservation cancelled");
             } catch (err) {
               console.error("Failed to cancel reservation:", err);

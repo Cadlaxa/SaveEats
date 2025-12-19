@@ -153,18 +153,25 @@ function createItemElement(id, item, index) {
         : item.description)
     : "No item description";
 
+  // Check availability (assume true if tag missing)
+  const isAvailable = item.available !== undefined ? item.available : true;
+
   div.innerHTML = `
-    <div class="item-image-wrapper">
-      <img src="${item.imageBase64 || 'assets/default-food.png'}" class="item-image">
+    <div class="item-image-wrapper" style="position: relative;">
+      <img src="${item.imageBase64 || 'assets/default-food.png'}" class="item-image" style="${!isAvailable ? 'filter: grayscale(100%); opacity: 0.6;' : ''}">
       <img src="${item.imageBase64 || 'assets/default-food.png'}" class="item-image-bg">
-      <div class="reservation-preview" id="reservationPreview-${id}"></div>
       
+      ${!isAvailable ? `<div class="unavailable-overlay">UNAVAILABLE</div>` : ''}
+
+      <div class="reservation-preview" id="reservationPreview-${id}"></div>
       <div class="price-img">
           <span class="discounted-price">₱${item.discountedPrice}</span>
       </div>
     </div>
     <div class="item-details">
-      <h3>${item.name}</h3>
+      <h3 class="${!isAvailable ? "unavailable" : ""}">
+        ${item.name} ${!isAvailable ? "" : ""}
+      </h3>
 
       <div class="bottom-row">
         <div class="price-row">
@@ -183,22 +190,23 @@ function createItemElement(id, item, index) {
     </div>
   `;
 
-    requestAnimationFrame(() => {
-      div.style.transitionDelay = `${index * 60}ms`;
-      div.getBoundingClientRect();
-      div.classList.add("enter");
-      setTimeout(() => {
-        div.style.transitionDelay = "0ms";
-      }, index * 60 + 500);
-    });
-    /*div.addEventListener("click", () => {
-      editItem(id);
-    });*/
-   
-  // Re-attach hover/click sounds only once
-  if (window.attachHoverListeners) {
-    window.attachHoverListeners();
+  // Style unavailable name
+  if (!isAvailable) {
+    div.querySelector("h3.unavailable").style.textDecoration = "line-through";
+    div.querySelector("h3.unavailable").style.color = "var(--dark-orange)";
   }
+
+  requestAnimationFrame(() => {
+    div.style.transitionDelay = `${index * 60}ms`;
+    div.getBoundingClientRect();
+    div.classList.add("enter");
+    setTimeout(() => {
+      div.style.transitionDelay = "0ms";
+    }, index * 60 + 500);
+  });
+
+  // Re-attach hover/click sounds only once
+  if (window.attachHoverListeners) window.attachHoverListeners();
 
   // Reservation dots overlay
   const previewContainer = div.querySelector(`#reservationPreview-${id}`);
@@ -222,8 +230,7 @@ function createItemElement(id, item, index) {
       dot.className = "reservation-dot";
       dot.title = userData.username || "User";
 
-      // Priority: Firestore photo → current logged-in auth photo if same user → fallback
-      let profileSrc = "Resources/assets/profile.jpg"; // default fallback
+      let profileSrc = "Resources/assets/profile.jpg";
       if (userData.profileImage) {
         profileSrc = userData.profileImage;
       } else if (auth.currentUser && auth.currentUser.uid === reservation.userId && auth.currentUser.photoURL) {
@@ -234,7 +241,6 @@ function createItemElement(id, item, index) {
       previewContainer.appendChild(dot);
     }
 
-    // More count if > 5
     if (snap.docs.length > 5) {
       const more = document.createElement("span");
       more.className = "reservation-dot-more";
@@ -346,15 +352,14 @@ window.deleteItem = async function(id) {
 // -------------------------------
 // EDIT ITEM
 // -------------------------------
-
 function toLocalInputValue(date) {
   const pad = n => String(n).padStart(2, "0");
-
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}` +
          `T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
 let originalExpiry = null;
+
 window.editItem = async function(id) {
   try {
     const docSnap = await getDoc(doc(db, "items", id));
@@ -366,20 +371,25 @@ window.editItem = async function(id) {
     itemsModal.classList.add("visible");
     document.querySelector(".window-title").textContent = "Edit Item";
 
+    const now = new Date();
+    itemExpiry.min = toLocalInputValue(now); 
+
     if (item.expiryTime) {
       originalExpiry = item.expiryTime.toDate
         ? item.expiryTime.toDate()
         : new Date(item.expiryTime);
 
+      // Ensure originalExpiry is not in the past
+      if (originalExpiry < now) originalExpiry = now;
+
       itemExpiry.value = toLocalInputValue(originalExpiry);
     } else {
-      itemExpiry.value = "";
+      itemExpiry.value = toLocalInputValue(now);
+      originalExpiry = now;
     }
 
     itemExpiry.addEventListener("click", () => {
-      if (itemExpiry.showPicker) {
-        itemExpiry.showPicker();
-      }
+      if (itemExpiry.showPicker) itemExpiry.showPicker();
     });
 
     itemExpiry.addEventListener("focus", () => {
@@ -395,11 +405,10 @@ window.editItem = async function(id) {
     itemOriginalPrice.value = item.originalPrice;
     itemDiscountedPrice.value = item.discountedPrice;
     itemQuantity.value = item.quantity;
-    //itemExpiry.value = item.expiryTime ? new Date(item.expiryTime.toDate ? item.expiryTime.toDate() : item.expiryTime).toISOString().slice(0,16) : "";
-    //originalExpiry = expireStr ?? null;
 
     itemPreviewImage.src = item.imageBase64 || "Resources/assets/food.png";
     selectedItemImage.src = item.imageBase64 || "";
+
   } catch (err) {
     showError("Failed to load item for editing: " + err.message);
   }
@@ -408,9 +417,9 @@ window.editItem = async function(id) {
 // -------------------------------
 // SAVE ITEM
 // -------------------------------
-
 document.getElementById("addItemForm").addEventListener("submit", saveItem);
 let isSaving = false;
+
 async function saveItem(e) {
   e?.preventDefault();
   if (isSaving) return;
@@ -427,25 +436,35 @@ async function saveItem(e) {
   const originalPrice = Number(itemOriginalPrice.value);
   const discountedPrice = Number(itemDiscountedPrice.value);
   const quantity = Number(itemQuantity.value);
-  let expiryTime = null;
 
+  // Handle expiryTime
+  let expiryTime = null;
   if (!currentEditId) {
-      // Add Mode
-      expiryTime = itemExpiry.value ? new Date(itemExpiry.value) : null;
+    // Add Mode
+    expiryTime = itemExpiry.value ? new Date(itemExpiry.value) : null;
   } else {
-      // Edit Mode — only update if user typed something
-      if (itemExpiry.value) {
-          expiryTime = new Date(itemExpiry.value);
-      } else {
-          expiryTime = originalExpiry; // <- keep original
-      }
+    // Edit Mode
+    if (itemExpiry.value) {
+      expiryTime = new Date(itemExpiry.value);
+    } else {
+      expiryTime = null; // cleared input => remove expiry
+    }
   }
 
+  // Determine availability
+  let available = true;
+  const now = new Date();
+  if (expiryTime && expiryTime <= now) {
+    available = false;
+  }
+
+  // Basic validation
   if (!name || !selectedItemImage.src || !originalPrice || !discountedPrice || !quantity) {
     isSaving = false;
     return alert("Please fill all required fields");
   }
 
+  // Prepare compressed image
   const canvas = document.createElement("canvas");
   canvas.width = 300;
   canvas.height = 300;
@@ -470,7 +489,8 @@ async function saveItem(e) {
         originalPrice,
         discountedPrice,
         quantity,
-        expiryTime,
+        expiryTime: expiryTime || null, // cleared => null
+        available,
         imageBase64: compressedBase64
       });
 
@@ -484,7 +504,8 @@ async function saveItem(e) {
         originalPrice,
         discountedPrice,
         quantity,
-        expiryTime,
+        expiryTime: expiryTime || null,
+        available,
         imageBase64: compressedBase64,
         createdAt: serverTimestamp()
       });
@@ -517,3 +538,47 @@ function clearItemForm() {
   currentEditId = null;
   document.querySelector(".window-title").textContent = "Adding new Item";
 }
+
+function setupExpiredItemsListener() {
+  const itemsCol = collection(db, "items");
+
+  onSnapshot(itemsCol, snapshot => {
+      const batch = writeBatch(db);
+      const now = new Date();
+      let updatedCount = 0;
+
+      snapshot.docs.forEach(docSnap => {
+          const item = docSnap.data();
+
+          // Determine expiry date
+          let expiryDate = null;
+          if (item.expiryTime) {
+              if (typeof item.expiryTime.toDate === "function") {
+                  expiryDate = item.expiryTime.toDate();
+              } else {
+                  expiryDate = new Date(item.expiryTime);
+              }
+          }
+
+          // Default available to true if undefined
+          const isAvailable = item.available !== undefined ? item.available : true;
+
+          // If expiry is past, mark unavailable
+          if (expiryDate && expiryDate <= now && isAvailable) {
+              batch.update(docSnap.ref, { available: false });
+              updatedCount++;
+          }
+
+          // If expiry is in the future and previously unavailable, mark available again
+          if (expiryDate && expiryDate > now && !isAvailable) {
+              batch.update(docSnap.ref, { available: true });
+              updatedCount++;
+          }
+      });
+
+      if (updatedCount > 0) batch.commit();
+      if (updatedCount > 0) console.log(`Updated availability for ${updatedCount} items`);
+  });
+}
+
+setupExpiredItemsListener();

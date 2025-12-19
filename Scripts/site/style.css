@@ -2239,6 +2239,21 @@ html {
   transition: all 0.2s ease-in-out;
 }
 
+.unavailable-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--dark-orange);
+  color: var(--orangeHL);
+  font-weight: bold;
+  font-size: 20px;
+  padding: 5px 10px;
+  border-radius: var(--radius-inner);
+  pointer-events: none;
+  z-index: 2;
+}
+
 /* Home user page */
 .restaurant-grid {
   display: grid;
@@ -3282,5 +3297,9 @@ html {
 
   .window-container {
     margin-bottom: 8vh;
+  }
+  
+  .unavailable-overlay {
+    font-size: 22px;
   }
 }
