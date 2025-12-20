@@ -560,58 +560,63 @@ function clearItemForm() {
 
 let availabilitySyncTimer = null;
 
-function startGlobalAvailabilityBackgroundSync(intervalMs = 60_000) {
-  if (availabilitySyncTimer) return; // prevent duplicate timers
+async function runGlobalAvailabilitySync() {
+  const user = auth.currentUser;
+  if (!user) return;
 
-  availabilitySyncTimer = setInterval(async () => {
-    const user = auth.currentUser;
-    if (!user) return;
+  try {
+    const q = query(collection(db, "items"));
+    const snap = await getDocs(q);
+    if (snap.empty) return;
 
-    try {
-      // 🔍 QUERY ALL ITEMS (no owner filter)
-      const q = query(collection(db, "items"));
-      const snap = await getDocs(q);
-      if (snap.empty) return;
+    const now = Date.now();
+    const batch = writeBatch(db);
+    let updated = 0;
 
-      const now = Date.now();
-      const batch = writeBatch(db);
-      let updated = 0;
+    snap.forEach(docSnap => {
+      const item = docSnap.data();
+      if (!item.expiryTime) return;
 
-      snap.forEach(docSnap => {
-        const item = docSnap.data();
-        if (!item.expiryTime) return;
+      // Normalize expiry time
+      const expiryMs =
+        typeof item.expiryTime.toDate === "function"
+          ? item.expiryTime.toDate().getTime()
+          : new Date(item.expiryTime).getTime();
 
-        // Normalize expiry time
-        let expiryMs;
-        if (typeof item.expiryTime.toDate === "function") {
-          expiryMs = item.expiryTime.toDate().getTime();
-        } else {
-          expiryMs = new Date(item.expiryTime).getTime();
-        }
+      // Old items without `available` → treated as available
+      const isAvailable = item.available !== false;
 
-        // Default: old items without `available` are treated as available
-        const isAvailable = item.available !== false;
-
-        /*
-         ONE-WAY STATE CHANGE
-         Expired + still available → mark unavailable ONCE
-         */
-        if (expiryMs <= now && isAvailable) {
-          batch.update(docSnap.ref, {
-            available: false,
-            availabilityUpdatedAt: new Date()
-          });
-          updated++;
-        }
-      });
-
-      if (updated > 0) {
-        await batch.commit();
-        console.log(`✔ Global sync: ${updated} expired items flagged`);
+      /*
+        ONE-WAY STATE CHANGE
+        Expired + still available → mark unavailable ONCE
+      */
+      if (expiryMs <= now && isAvailable) {
+        batch.update(docSnap.ref, {
+          available: false,
+          availabilityUpdatedAt: new Date()
+        });
+        updated++;
       }
+    });
 
-    } catch (err) {
-      console.error("Global availability sync failed:", err.code || err.message);
+    if (updated > 0) {
+      await batch.commit();
+      console.log(`✔ Global sync: ${updated} expired items flagged`);
     }
-  }, intervalMs);
+  } catch (err) {
+    console.error("Global availability sync failed:", err.code || err.message);
+  }
+}
+
+function startGlobalAvailabilityBackgroundSync(intervalMs = 60_000) {
+  if (availabilitySyncTimer) return; // prevent duplicates
+
+  // RUN IMMEDIATELY
+  runGlobalAvailabilitySync();
+
+  // THEN RUN ON INTERVAL
+  availabilitySyncTimer = setInterval(
+    runGlobalAvailabilitySync,
+    intervalMs
+  );
 }
