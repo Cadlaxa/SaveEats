@@ -77,13 +77,29 @@ document.addEventListener('DOMContentLoaded', () => {
     MobileCloseButtons.forEach(button => {
         let startY = 0;
         let moved = false;
+        let isTouch = false;
+
+        const closeModal = (e) => {
+            const parentModal = button.closest('.modal-container');
+            if (!parentModal) return;
+
+            parentModal.classList.remove('visible');
+            modalManager.close([parentModal]);
+
+            navigator.vibrate?.([30]);
+            toggleModalBtn.style.display = 'none';
+            activeModal = null;
+
+            e?.preventDefault();
+            e?.stopPropagation();
+        };
+
+        /* ---------- TOUCH ---------- */
 
         button.addEventListener('touchstart', e => {
+            isTouch = true;
             startY = e.touches[0].clientY;
             moved = false;
-
-            // Prevent underlying clicks from triggering
-            e.stopPropagation();
         }, { passive: true });
 
         button.addEventListener('touchmove', e => {
@@ -91,8 +107,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (Math.abs(currentY - startY) > 5) {
                 moved = true;
             }
-
-            e.stopPropagation();
         }, { passive: true });
 
         button.addEventListener('touchend', e => {
@@ -103,23 +117,27 @@ document.addEventListener('DOMContentLoaded', () => {
             const isTap = !moved || Math.abs(swipeDistance) < 5;
 
             if (isSwipeUp || isTap) {
-                const parentModal = button.closest('.modal-container');
-                if (parentModal) {
-                    parentModal.classList.remove('visible');
-                    modalManager.close([parentModal]);
-                }
-                navigator.vibrate?.([30]);
-                toggleModalBtn.style.display = 'none';
-                activeModal = null;
-
-                // Prevent click from propagating to layers below
-                e.preventDefault();
-                e.stopPropagation();
+                closeModal(e);
             }
 
             startY = 0;
             moved = false;
+
+            // Reset after touch so click doesn't fire
+            setTimeout(() => (isTouch = false), 0);
         });
+
+        /* ---------- MOUSE / DESKTOP ---------- */
+
+        button.addEventListener('click', e => {
+            // Ignore synthetic click after touch
+            if (isTouch) return;
+
+            closeModal(e);
+        });
+
+        /* ---------- OPTIONAL HOVER ---------- */
+
         if (window.attachHoverListeners) {
             window.attachHoverListeners();
         }
@@ -469,5 +487,6 @@ document.addEventListener('DOMContentLoaded', () => {
             window.modalManager.closeTop();
         }
     });
+    
 
 });

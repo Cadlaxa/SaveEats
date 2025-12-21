@@ -69,6 +69,13 @@ document.addEventListener("DOMContentLoaded", () => {
     notifModal.classList.add("visible");
   };
 
+  // Optional: close modal when clicking outside
+  window.addEventListener("click", (e) => {
+    if (e.target === submitModal || e.target === errorModal || e.target === notifModal) {
+      e.target.classList.remove("visible");
+    }
+  });
+
   /* ---------------- FIRESTORE PROFILE ---------------- */
 
   const writeOrUpdateUserProfile = async (user) => {

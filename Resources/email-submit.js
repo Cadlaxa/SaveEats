@@ -58,13 +58,6 @@ document.addEventListener("DOMContentLoaded", () => {
     navigator.vibrate?.([50, 150, 50]);
   }
 
-  // Close modals when clicking the × button
-  closeButtons.forEach(btn => {
-    btn.addEventListener("click", () => {
-      btn.closest(".modal-container").classList.remove("visible");
-    });
-  });
-
   // Optional: close modal when clicking outside
   window.addEventListener("click", (e) => {
     if (e.target === submitModal || e.target === errorModal || e.target === notifModal) {
