@@ -618,7 +618,7 @@ qrBackdrop.addEventListener("click", closeRedeemModal);
 function listenUserProfile() {
   auth.onAuthStateChanged(async user => {
     if (!user) return window.location.href = "index.html";
-    if (localStorage.getItem("loggedInUserType") !== "user") return window.location.href = "home-user.html";
+    if (localStorage.getItem("loggedInUserType") !== "user") return window.location.href = "/";
 
     const profileImg = document.getElementById("profileImageHome");
     const userRef = doc(db, "users", user.uid);

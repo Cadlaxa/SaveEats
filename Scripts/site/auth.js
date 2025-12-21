@@ -18,6 +18,26 @@ import {
 
 document.addEventListener("DOMContentLoaded", () => {
 
+  /* ---------------- HELPERS ---------------- */
+
+  const isAuthPage = () => {
+    const page = window.location.pathname.split("/").pop();
+    return (
+      page === "" ||
+      page === "index.html" ||
+      page === "sign-up.html" ||
+      page === "sign-up-resto.html" ||
+      page === "index" ||
+      page === "sign-up" ||
+      page === "sign-up-resto"
+    );
+  };
+
+  const isIOS = () =>
+    /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+  /* ---------------- ELEMENTS ---------------- */
+
   const loginForm = document.getElementById("loginForm");
   const signUpForm = document.getElementById("SignUpForm");
   const restoBtn = document.getElementById("restoAcc");
@@ -31,14 +51,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const errorMessageBox = errorModal?.querySelector(".error-message");
   const notifMessageBox = notifModal?.querySelector(".notif-message");
 
-  const closeButtons = document.querySelectorAll(".close-btn");
-
   const googleLoginBtn = document.getElementById("googleLoginBtn");
   const appleLoginBtn = document.getElementById("appleLoginBtn");
   const emailModal = document.getElementById("contact-modal");
-
-  const isIOS = () =>
-    /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
   /* ---------------- MODALS ---------------- */
 
@@ -54,73 +69,30 @@ document.addEventListener("DOMContentLoaded", () => {
     notifModal.classList.add("visible");
   };
 
-  closeButtons.forEach(btn => {
-    btn.addEventListener("click", () =>
-      btn.closest(".modal-container")?.classList.remove("visible")
-    );
-  });
-
   /* ---------------- FIRESTORE PROFILE ---------------- */
 
   const writeOrUpdateUserProfile = async (user) => {
-    if (!user) return;
+    const ref = doc(db, "users", user.uid);
+    const snap = await getDoc(ref);
 
-    const userRef = doc(db, "users", user.uid);
-    const snap = await getDoc(userRef);
-    const existing = snap.exists() ? snap.data() : {};
-
-    const updates = {
-      email: user.email || existing.email || "",
-      type: existing.type || "user"
-    };
-
-    if (user.displayName) updates.username = user.displayName;
-    if (user.photoURL) updates.profileImage = user.photoURL;
-
-    await setDoc(userRef, updates, { merge: true });
+    await setDoc(ref, {
+      email: user.email,
+      username: user.displayName || snap.data()?.username || "",
+      profileImage: user.photoURL || snap.data()?.profileImage || "",
+      type: snap.data()?.type || "user"
+    }, { merge: true });
   };
 
-  /* ---------------- SUBMIT MODAL + REDIRECT ---------------- */
-
-  async function showSubmitModalAndRedirect(passedType) {
-    submitModal.classList.add("visible");
-
-    let userType = passedType || "user";
-    const user = auth.currentUser;
-
-    if (!passedType && user) {
-      try {
-        const snap = await getDoc(doc(db, "users", user.uid));
-        if (snap.exists()) userType = snap.data().type || "user";
-      } catch {}
-    }
-
-    localStorage.setItem("loggedInUserType", userType);
-
-    setTimeout(() => {
-      window.location.href =
-        userType === "restaurant"
-          ? "resto-dashboard.html"
-          : "home-user.html";
-    }, 3000);
-  }
-
-  /* ---------------- HANDLE REDIRECT (iOS FIX) ---------------- */
+  /* ---------------- REDIRECT RESULT (ONCE) ---------------- */
 
   (async () => {
     try {
       const result = await getRedirectResult(auth);
-
       if (result?.user) {
         await writeOrUpdateUserProfile(result.user);
-
-        // prevent onAuthStateChanged race
-        localStorage.setItem("justRedirected", "true");
-
-        showSubmitModalAndRedirect("user");
       }
-    } catch (error) {
-      showError(error.message);
+    } catch (err) {
+      showError(err.message);
     }
   })();
 
@@ -129,42 +101,23 @@ document.addEventListener("DOMContentLoaded", () => {
   onAuthStateChanged(auth, async (user) => {
     if (!user) return;
 
-    let currentUser = user;
-    // Only check redirect result once per page load
-    const justRedirected = localStorage.getItem("justRedirected");
+    if (!isAuthPage()) return;
 
-    if (isIOS() && !justRedirected) {
-      try {
-        const result = await getRedirectResult(auth);
-        if (result?.user) currentUser = result.user;
-        // Mark as handled so we don't redirect again
-        localStorage.setItem("justRedirected", "true");
-      } catch { /* ignore */ }
-    }
+    // Try cached type first
+    let type = localStorage.getItem("loggedInUserType");
 
     try {
-      // Skip redirect if we already redirected
-      //if (localStorage.getItem("redirected")) return;
-
-      const snap = await getDoc(doc(db, "users", currentUser.uid));
-      if (!snap.exists()) return;
-
-      const type = snap.data().type || "user";
-      localStorage.setItem("loggedInUserType", type);
-
-      const page = window.location.pathname.split("/").pop();
-      if (
-        page === "" ||
-        page === "index.html" ||
-        page === "sign-up.html" ||
-        page === "sign-up-resto.html"
-      ) {
-        localStorage.setItem("redirected", "true");
-        window.location.href =
-          type === "restaurant"
-            ? "resto-dashboard.html"
-            : "home-user.html";
+      if (!type) {
+        const snap = await getDoc(doc(db, "users", user.uid));
+        type = snap.exists() ? snap.data().type : "user";
+        localStorage.setItem("loggedInUserType", type);
       }
+
+      window.location.href =
+        type === "restaurant"
+          ? "resto-dashboard.html"
+          : "home-user.html";
+
     } catch (err) {
       showError(err.message);
     }
@@ -173,7 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function checkEmailExists(email) {
     try {
       const methods = await fetchSignInMethodsForEmail(auth, email);
-      return methods; // [] = not registered
+      return methods; // [] = not registered 
     } catch (err) {
       throw err;
     }
@@ -193,7 +146,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const snap = await getDoc(doc(db, "users", cred.user.uid));
       const type = snap.exists() ? snap.data().type : "user";
 
-      showSubmitModalAndRedirect(type);
+      localStorage.setItem(
+        "loggedInUserType",
+        snap.exists() ? snap.data().type : "user"
+      );
       loginForm.reset();
 
     } catch (err) {
@@ -237,7 +193,10 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       await writeOrUpdateUserProfile(result.user);
-      showSubmitModalAndRedirect("user");
+      localStorage.setItem(
+        "loggedInUserType",
+        snap.exists() ? snap.data().type : "user"
+      );
 
     } catch (err) {
       showError(err.message);
@@ -269,7 +228,10 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       await writeOrUpdateUserProfile(result.user);
-      showSubmitModalAndRedirect("user");
+      localStorage.setItem(
+        "loggedInUserType",
+        snap.exists() ? snap.data().type : "user"
+      );
 
     } catch (err) {
       showError(err.message);
@@ -297,7 +259,10 @@ document.addEventListener("DOMContentLoaded", () => {
         type: "user"
       });
 
-      showSubmitModalAndRedirect("user");
+      localStorage.setItem(
+        "loggedInUserType",
+        snap.exists() ? snap.data().type : "user"
+      );
       signUpForm.reset();
     } catch (err) {
       showError(err.message);
@@ -327,7 +292,10 @@ document.addEventListener("DOMContentLoaded", () => {
         type: "restaurant"
       });
 
-      showSubmitModalAndRedirect("restaurant");
+      localStorage.setItem(
+        "loggedInUserType",
+        snap.exists() ? snap.data().type : "restaurant"
+      );
       restoForm.reset();
     } catch (err) {
       showError(err.message);
