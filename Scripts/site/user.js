@@ -406,7 +406,7 @@ async function openRedeemModal(itemId) {
     qrBackdrop.classList.add("visible");
     listenRedeemedItems(itemId);
     modalManager.open([qrModal, qrBackdrop]);
-    navigator.vibrate([40]);
+    safeVibrate([40]);
 
   } catch (err) {
     showError("Unable to check item availability: " + err.message);
@@ -435,7 +435,7 @@ async function openReserveModal(reservationId, itemId) {
     qrModal.classList.add("visible");
     qrBackdrop.classList.add("visible");
     modalManager.open([qrModal, qrBackdrop]);
-    navigator.vibrate([40]);
+    safeVibrate([40]);
 
     // Start the listener for real-time updates
     listenReservedRedemptions(reservationId, itemId);
@@ -599,7 +599,7 @@ function closeRedeemModalWithFX() {
       });
     }, 300);
     
-  navigator.vibrate([80, 50, 80]);
+  safeVibrate([80, 50, 80]);
   qrModal.classList.remove("visible");
   setTimeout(() => {
       qrBackdrop.classList.remove("visible");
@@ -651,7 +651,7 @@ const profileImgModal = document.getElementById("profile-img-modal");
 const profileCloseBtn = profileImgModal.querySelector(".close-btn");
 
 profileHomeImg.addEventListener("click", () => {
-    navigator.vibrate([50, 150, 50])
+    safeVibrate([50, 150, 50])
     loadCurrentProfile();
     profileImgModal.classList.add("visible");
 });
@@ -911,7 +911,7 @@ function listenReservedItems(userId) {
             const ctx = canvas.getContext("2d");
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             QRCode.toCanvas(canvas, qrData, { width: 220 }, error => { if (error) console.error(error); });
-
+            safeVibrate([50, 150, 50]);
             openReserveModal(reservation.id, reservation.itemId);
           };
 

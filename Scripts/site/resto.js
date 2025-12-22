@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const editProfileBtn = document.getElementById("editProfileBtn");
   const editBannerBtn = document.getElementById("editBannerBtn");
   editProfileBtn.addEventListener("click", () => {
-      navigator.vibrate([50, 150, 50])
+      safeVibrate([50, 150, 50])
       loadCurrentProfile();
       profileModal.classList.add("visible");
       modalManager.open([profileModal]);
@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // OPEN BANNER MODAL
   editBannerBtn.addEventListener("click", () => {
-      navigator.vibrate([50, 150, 50])
+      safeVibrate([50, 150, 50])
       loadCurrentBanner();
       bannerModal.classList.add("visible");
       modalManager.open([bannerModal]);
@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   addItemBtn.addEventListener("click", () => {
-    navigator.vibrate([50, 150, 50]);
+    safeVibrate([50, 150, 50]);
     
     const isVisible = addItemModal.classList.contains("visible");
     if (isVisible) {

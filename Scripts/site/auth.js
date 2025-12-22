@@ -60,12 +60,14 @@ document.addEventListener("DOMContentLoaded", () => {
   window.showError = (msg) => {
     if (!errorModal) return;
     errorMessageBox.textContent = msg;
+    safeVibrate([80, 150, 80, 150, 80]);
     errorModal.classList.add("visible");
   };
 
   window.showNotif = (msg) => {
     if (!notifModal) return;
     notifMessageBox.textContent = msg;
+    safeVibrate([80, 150, 80]);
     notifModal.classList.add("visible");
   };
 

@@ -13,6 +13,14 @@ document.addEventListener('DOMContentLoaded', () => {
         event.preventDefault();
     });
 
+    window.safeVibrate ||= function (pattern) {
+        try {
+            if ('vibrate' in navigator && typeof navigator.vibrate === 'function') {
+            navigator.vibrate(pattern);
+            }
+        } catch {}
+    };
+
     const element = document.querySelector('.cad-name-special');
     if (element) {
         const text = element.textContent;
@@ -86,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
             parentModal.classList.remove('visible');
             modalManager.close([parentModal]);
 
-            navigator.vibrate?.([30]);
+            safeVibrate([30]);
             toggleModalBtn.style.display = 'none';
             activeModal = null;
 
@@ -397,7 +405,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const faqAnswer = faqItem.querySelector('.faq-answer');
                 faqItem.classList.toggle('open');
                 tryShowModalMessage('faq-modal');
-                navigator.vibrate([20])
+                safeVibrate([20])
             });
         });
     }
@@ -471,7 +479,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (this.stack.length === 0) return;
             const topGroup = this.stack.pop();
             topGroup.forEach(el => el.classList.remove("visible"));
-            navigator.vibrate([40]);
+            safeVibrate([40]);
  
             // If nothing left, unlock history
             if (this.stack.length === 0) {

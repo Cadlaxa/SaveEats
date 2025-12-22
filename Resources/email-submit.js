@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (response.status === 200) {
         emailModal.classList.remove("visible")
         showNotif(`We will email you later once we validate your resto, thank you`);
-        navigator.vibrate?.([50, 150, 50]);
+        safeVibrate([50, 150, 50]);
         form.reset();
       } else {
         showError(`Unexpected response from server: ${response.status}`);
@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function showError(message) {
     errorMessageBox.textContent = message;
     errorModal.classList.add("visible");
-    navigator.vibrate?.([50, 150, 50]);
+    safeVibrate([50, 150, 50]);
   }
 
   // Optional: close modal when clicking outside
