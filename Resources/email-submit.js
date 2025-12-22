@@ -23,7 +23,10 @@ document.addEventListener("DOMContentLoaded", () => {
       name: form.name.value,
       email: form.email.value,
       subject: form.subject.value,
-      message: form.message.value
+      location: form.location?.value.trim() || "Not provided",
+      socials: form.socials?.value.trim() || "Not provided",
+      number: form.number?.value.trim() || "Not provided",
+      others: form.others?.value.trim() || "Not provided"
     };
 
     try {
@@ -31,7 +34,10 @@ document.addEventListener("DOMContentLoaded", () => {
         from_name: formData.name,
         from_email: formData.email,
         subject: formData.subject,
-        message: formData.message
+        location: formData.location,
+        socials: formData.socials,
+        number: formData.number,
+        others: formData.others,
       });
 
       if (response.status === 200) {

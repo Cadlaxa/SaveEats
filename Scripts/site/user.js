@@ -794,6 +794,14 @@ auth.onAuthStateChanged(user => {
 const reservedGrid = document.getElementById("reservedGrid");
 const reservationCards = new Map(); // reservationId => {div, unsubscribeItem}
 
+function updateReservedCounter(count) {
+  const badge = document.getElementById("reservedCount");
+  if (!badge) return;
+
+  badge.textContent = count;
+  badge.style.display = count > 0 ? "inline-block" : "none";
+}
+
 function listenReservedItems(userId) {
   if (!userId) return;
 
@@ -805,6 +813,7 @@ function listenReservedItems(userId) {
   let reservationSortOrder = "asc"; 
   onSnapshot(q, snap => {
     const newIds = new Set(snap.docs.map(d => d.id));
+    updateReservedCounter(snap.size);
     // Animate removals
     reservationCards.forEach(({ div, unsubscribeItem }, id) => {
       if (!newIds.has(id)) {
@@ -910,7 +919,7 @@ function listenReservedItems(userId) {
 
             const ctx = canvas.getContext("2d");
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            QRCode.toCanvas(canvas, qrData, { width: 220 }, error => { if (error) console.error(error); });
+            QRCode.toCanvas(canvas, qrData, error => { if (error) console.error(error); });
             safeVibrate([50, 150, 50]);
             openReserveModal(reservation.id, reservation.itemId);
           };
