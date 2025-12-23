@@ -551,6 +551,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startY = currentY = 0;
     }
-    
 
 });
