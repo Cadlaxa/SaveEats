@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const MobileCloseButtons = document.querySelectorAll('.nav-bar');
     const modalContainers = document.querySelectorAll('.modal-container');
     const toggleModalBtn = document.querySelector('.toggle-modal-btn');
+    const qrModal = document.getElementById("qrSlideModal");
+    const qrBackdrop = document.getElementById("qrBackdrop");
     
     let highestZIndex = 1000;
     let activeModal = null;
@@ -495,6 +497,60 @@ document.addEventListener('DOMContentLoaded', () => {
             window.modalManager.closeTop();
         }
     });
+
+    let startY = 0;
+    let currentY = 0;
+    let dragging = false;
+
+    qrModal.addEventListener("pointerdown", (e) => {
+    // only primary button / finger
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+
+    startY = e.clientY;
+    dragging = true;
+
+    qrModal.setPointerCapture(e.pointerId);
+    qrModal.style.transition = "none";
+    });
+
+    qrModal.addEventListener("pointermove", (e) => {
+    if (!dragging) return;
+
+    currentY = e.clientY;
+    const deltaY = Math.max(0, currentY - startY);
+
+    qrModal.style.transform = `translate(-50%, ${deltaY}px)`;
+    });
+
+    qrModal.addEventListener("pointerup", finishDrag);
+    qrModal.addEventListener("pointercancel", finishDrag);
+
+    function finishDrag(e) {
+    if (!dragging) return;
+
+    dragging = false;
+    qrModal.releasePointerCapture?.(e.pointerId);
+    qrModal.style.transition = "transform 0.25s ease";
+
+    const deltaY = Math.max(0, currentY - startY);
+
+    if (deltaY > 120) {
+        qrModal.classList.remove("visible");
+        qrBackdrop.classList.remove("visible");
+        qrModal.style.transform = "translate(-50%, 100%)";
+        
+        setTimeout(() => {
+            qrModal.style.transform = "";
+        }, 250);
+
+        modalManager.close([qrModal, qrBackdrop]);
+        safeVibrate?.([50]);
+    } else {
+        qrModal.style.transform = "translate(-50%, 0)";
+    }
+
+    startY = currentY = 0;
+    }
     
 
 });
