@@ -80,3 +80,15 @@ self.addEventListener('notificationclick', event => {
     })
   );
 });
+
+self.addEventListener("install", () => {
+  self.skipWaiting();
+});
+
+self.addEventListener("activate", () => {
+  self.clients.claim();
+});
+
+navigator.serviceWorker.addEventListener("controllerchange", () => {
+  window.location.reload();
+});
