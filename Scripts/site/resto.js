@@ -524,7 +524,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 
-  function stopQrScan() {
+  window.stopQrScan = function() {
       if (!qrScanner) return;
       qrScanner.stop()
           .then(() => {

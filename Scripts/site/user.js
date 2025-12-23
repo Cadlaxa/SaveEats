@@ -612,7 +612,6 @@ function closeRedeemModalWithFX() {
 }
 
 // Clicking background closes
-qrCanvas.addEventListener("click", closeRedeemModal);
 qrBackdrop.addEventListener("click", closeRedeemModal);
 
 function listenUserProfile() {
