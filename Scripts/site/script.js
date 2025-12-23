@@ -7,6 +7,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const qrModal = document.getElementById("qrSlideModal");
     const qrBackdrop = document.getElementById("qrBackdrop");
     const qrscanner = document.querySelector(".qr-center");
+
+    if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('Scripts/site/service-worker.js')
+        .then(reg => console.log('Service Worker registered', reg))
+        .catch(err => console.log('Service Worker registration failed', err));
+    });
+    }
     
     let highestZIndex = 1000;
     let activeModal = null;
