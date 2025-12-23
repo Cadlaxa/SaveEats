@@ -273,34 +273,36 @@ function createItemElement(id, item, index) {
     };
 
     // ---- NOTIFICATION LOGIC ----
-    for (const change of snap.docChanges()) {
-      if (change.type !== "added") continue;
+    let isInitialLoad = true;
+    onSnapshot(q, async (snap) => {
 
-      const reservation = change.doc.data();
-
-      // Ignore initial load (VERY IMPORTANT)
-      if (!change.doc.metadata.hasPendingWrites && snap.metadata.fromCache) {
-        continue;
+      if (isInitialLoad) {
+        isInitialLoad = false;
+        return; // ignore existing reservations
       }
 
-      // Fetch user
-      const userRef = doc(db, "users", reservation.userId);
-      const userSnap = await getDoc(userRef);
-      const userData = userSnap.exists() ? userSnap.data() : {};
+      for (const change of snap.docChanges()) {
+        if (change.type !== "added") continue;
 
-      const username = userData.username || "Someone";
-      const itemName = item.name || "an item";
+        const reservation = change.doc.data();
 
-      if (Notification.permission === "granted") {
-        window.sendNotification("New Reservation 🥕", {
-          body: `${username} reserved ${itemName}`,
-          icon: "Resources/assets/icon1.png",
-          data: {
-            url: "resto-dashboard.html"
-          }
-        });
+        // fetch user
+        const userSnap = await getDoc(doc(db, "users", reservation.userId));
+        const userData = userSnap.exists() ? userSnap.data() : {};
+
+        const username = userData.username || "Someone";
+        const itemName = item.name || "an item";
+        console.log(`${username} reserved ${itemName}`)
+
+        if (Notification.permission === "granted") {
+          window.sendNotification("New Reservation 🥕", {
+            body: `${username} reserved ${itemName}`,
+            icon: "Resources/assets/icon1.png",
+            data: { url: "resto-dashboard.html" }
+          });
+        }
       }
-    }
+    });
   });
   return div;
 }
