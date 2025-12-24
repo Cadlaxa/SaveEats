@@ -88,7 +88,3 @@ self.addEventListener("install", () => {
 self.addEventListener("activate", () => {
   self.clients.claim();
 });
-
-navigator.serviceWorker.addEventListener("controllerchange", () => {
-  window.location.reload();
-});
