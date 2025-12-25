@@ -129,6 +129,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // --- Floating Button Toggle Functionality ---
+    toggleModalBtn.addEventListener('click', () => {
+        if (activeModal) {
+            activeModal.classList.toggle('visible');
+            const icon = toggleModalBtn.querySelector('i');
+            if (activeModal.classList.contains('visible')) {
+                icon.classList.remove('fa-square-plus');
+                icon.classList.add('fa-square-minus');
+            } else {
+                icon.classList.remove('fa-square-minus');
+                icon.classList.add('fa-square-plus');
+            }
+        }
+    });
+
     MobileCloseButtons.forEach(button => {
         let startY = 0;
         let moved = false;
@@ -219,9 +234,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle clicks on modals to bring them to the front
     modalContainers.forEach(container => {
         container.addEventListener('mousedown', (e) => {
+            toggleModalBtn.style.display = 'block';
             const modalWindow = e.target.closest('.modal-window');
             if (modalWindow) {
                 bringToFront(modalWindow);
+                activeModal = container;
             }
         });
     });
@@ -441,43 +458,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     })();
 
-
-    // Function to handle the FAQ dropdown
-    function setupFaqDropdown() {
-        const faqQuestions = document.querySelectorAll('.faq-question');
-
-        faqQuestions.forEach(question => {
-            question.addEventListener('click', () => {
-                const faqItem = question.parentElement;
-                const faqAnswer = faqItem.querySelector('.faq-answer');
-                faqItem.classList.toggle('open');
-                tryShowModalMessage('faq-modal');
-                safeVibrate([20])
-            });
-        });
-    }
-    setupFaqDropdown();
-
-
-    const faqIcon = document.getElementById('faq-icon');
-    const faqModal = document.getElementById('faq-modal');
-
-    if (faqIcon && faqModal) {
-        faqIcon.addEventListener('click', () => {
-            faqModal.classList.add('visible');
-        });
-
-        faqModal.querySelector('.close-btn').addEventListener('click', () => {
-            faqModal.classList.remove('visible');
-        });
-
-        faqModal.addEventListener('click', (e) => {
-            if (e.target === faqModal) {
-                faqModal.classList.remove('visible');
-            }
-        });
-    }
-    
     // navbar animation
     document.addEventListener("DOMContentLoaded", () => {
         const navBar = document.querySelector(".nav-bar");
