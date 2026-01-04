@@ -551,130 +551,6 @@ body {
   background-color: var(--orange);
   transition: background-color 0.2s ease;
 }
-
-/*.icon-about, .icon-links, .icon-projects, .icon-faq, .icon-contacts {
-  position: relative;
-  width: 60px;
-  height: 60px;
-  filter: drop-shadow(3px 3px 0px var(--icon-drop-shadow));
-  transition: all 0.2s ease;
-}
-
-.icon-item:hover .icon-about, 
-.icon-item:hover .icon-links, 
-.icon-item:hover .icon-projects, 
-.icon-item:hover .icon-faq, 
-.icon-item:hover .icon-contacts {
-  filter: drop-shadow(0px 0px 0px var(--icon-drop-shadow));
-}
-
-.icon-item:hover .icon-about::before, 
-.icon-item:hover .icon-links::before, 
-.icon-item:hover .icon-projects::before, 
-.icon-item:hover .icon-faq::before, 
-.icon-item:hover .icon-contacts::before {
-  background-color: var(--orangeL1);
-}
-
-.icon-about::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-color: var(--orange);
-  mask: url('resources/svg/icon_about.svg') no-repeat center / contain;
-  -webkit-mask: url('resources/svg/icon_about.svg') no-repeat center / contain;
-  transition: background-color 0.2s ease;
-}
-.icon-about::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-color: var(--dark-orange);
-  mask: url('resources/svg/icon_about_l.svg') no-repeat center / contain;
-  -webkit-mask: url('resources/svg/icon_about_l.svg') no-repeat center / contain;
-  transition: background-color 0.2s ease;
-}
-
-.icon-links::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-color: var(--orange);
-  mask: url('resources/svg/icon_links.svg') no-repeat center / contain;
-  -webkit-mask: url('resources/svg/icon_links.svg') no-repeat center / contain;
-  transition: background-color 0.2s ease;
-}
-.icon-links::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-color: var(--dark-orange);
-  mask: url('resources/svg/icon_links_l.svg') no-repeat center / contain;
-  -webkit-mask: url('resources/svg/icon_links_l.svg') no-repeat center / contain;
-  transition: background-color 0.2s ease;
-}
-
-.icon-projects::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-color: var(--orange);
-  mask: url('resources/svg/icon_projects.svg') no-repeat center / contain;
-  -webkit-mask: url('resources/svg/icon_projects.svg') no-repeat center / contain;
-  transition: background-color 0.2s ease;
-}
-.icon-projects::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-color: var(--dark-orange);
-  mask: url('resources/svg/icon_projects_l.svg') no-repeat center / contain;
-  -webkit-mask: url('resources/svg/icon_projects_l.svg') no-repeat center / contain;
-  transition: background-color 0.2s ease;
-}
-
-.icon-faq::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-color: var(--orange);
-  mask: url('resources/svg/icon_faq.svg') no-repeat center / contain;
-  -webkit-mask: url('resources/svg/icon_faq.svg') no-repeat center / contain;
-  transition: background-color 0.2s ease;
-}
-.icon-faq::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-color: var(--dark-orange);
-  mask: url('resources/svg/icon_faq_l.svg') no-repeat center / contain;
-  -webkit-mask: url('resources/svg/icon_faq_l.svg') no-repeat center / contain;
-  transition: background-color 0.2s ease;
-}
-
-.icon-contacts::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-color: var(--orange);
-  mask: url('resources/svg/icon_contacts.svg') no-repeat center / contain;
-  -webkit-mask: url('resources/svg/icon_contacts.svg') no-repeat center / contain;
-  transition: background-color 0.2s ease;
-}
-.icon-contacts::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-color: var(--dark-orange);
-  mask: url('resources/svg/icon_contacts_l.svg') no-repeat center / contain;
-  -webkit-mask: url('resources/svg/icon_contacts_l.svg') no-repeat center / contain;
-  transition: background-color 0.2s ease;
-}*/
-
-/*.icon-item:hover .icon {
-  background-color: var(--orangeHL);
-}*/
-
 .icon-item span {
   font-weight: 600;
   color: var(--dark-gray);
@@ -2762,6 +2638,41 @@ html {
   user-select: none;
   font-size: 18px;
   color: var(--orange);
+}
+
+.resto-owner-badge {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background: var(--mobile-icon-item);
+  backdrop-filter: blur(4px);
+  padding: 4px 10px 4px 6px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  width: fit-content;
+  max-width: 80%;
+  z-index: 2;
+}
+
+.owner-mini-img {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid white;
+  flex-shrink: 0;
+}
+
+.owner-mini-name {
+  color: var(--dark-orange);
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* iPads and tablet sizes */

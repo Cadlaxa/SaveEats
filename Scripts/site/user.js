@@ -1027,6 +1027,7 @@ function listenReservedItems(userId) {
           const item = itemSnap.exists() ? itemSnap.data() : {};
 
           const isAvailable = item.available !== false; // treat undefined as true
+          const ownerDisplayId = `owner-${reservation.id}`;
 
           div.innerHTML = `
             <div class="item-image-wrapper" style="position: relative;">
@@ -1037,6 +1038,12 @@ function listenReservedItems(userId) {
               <div class="price-img">
                   <span class="discounted-price">₱${item.discountedPrice}</span>
               </div>
+
+              <div class="resto-owner-badge" id="${ownerDisplayId}">
+                <img src="Resources/assets/profile.jpg" class="owner-mini-img">
+                <span class="owner-mini-name">Resto</span>
+              </div>
+              
             </div>
             <div class="item-details">
               <h3 style="${!isAvailable ? 'text-decoration: line-through;' : ''}">${item.name}</h3>
@@ -1056,6 +1063,23 @@ function listenReservedItems(userId) {
               <button class="redeem-btn">Redeem</button>
             </div>
           `;
+
+          if (item.ownerId) {
+            const ownerRef = doc(db, "users", item.ownerId);
+            getDoc(ownerRef).then(ownerSnap => {
+              const ownerContainer = div.querySelector(`#${ownerDisplayId}`);
+              if (ownerSnap.exists() && ownerContainer) {
+                const ownerData = ownerSnap.data();
+                const rawName = ownerData.username || "Restaurant";
+                // Limit name to 12 characters
+                const displayName = rawName.length > 12 ? rawName.substring(0, 12) + "..." : rawName;
+                const displayImg = ownerData.profileBase64 || "Resources/assets/profile.jpg";
+
+                ownerContainer.querySelector(".owner-mini-img").src = displayImg;
+                ownerContainer.querySelector(".owner-mini-name").textContent = displayName;
+              }
+            });
+          }
 
           const redeemBtn = div.querySelector(".redeem-btn");
           redeemBtn.onclick = () => {
@@ -1138,6 +1162,7 @@ document.getElementById("reserveItemBtn").addEventListener("click", async () => 
     await setDoc(doc(collection(db, "reservations")), {
       itemId: item.id,
       userId: user.uid,
+      ownerId: itemData.ownerId,
       name: itemData.name,
       reservedAt: new Date(),
       redeemed: false
