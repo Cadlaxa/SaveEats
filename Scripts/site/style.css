@@ -1914,6 +1914,63 @@ html {
   color: var(--ptext);
 }
 
+.resto-rating {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  gap: 2px;
+  font-size: 10px;
+  color: var(--orangeD);
+  cursor: pointer;
+  user-select: none;
+  z-index: 10;
+  background-color: var(--orangeL1);
+  border-radius: var(--radius-inner);
+  padding-left: 5px;
+  padding-right: 5px;
+  border: solid 2px var(--orangeL);
+}
+
+.banner-rating {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  gap: 2px;
+  font-size: 18px;
+  color: var(--orangeL);
+  cursor: pointer;
+  user-select: none;
+  z-index: 10;
+  background-color: var(--orangeL1);
+  border-radius: var(--radius-inner);
+  padding-left: 5px;
+  padding-right: 5px;
+  border: solid 3px var(--orangeL);
+}
+
+.banner-rating:hover {
+  border: solid 3px var(--orange);
+}
+
+.star.filled {
+  color: var(--orange) !important;
+}
+
+.star:hover {
+  transform: scale(1.2);
+}
+
+.average-rating {
+  margin-left: 5px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--orange);
+}
+
+.resto-average-rating {
+  font-weight: 600;
+}
+
 .edit-btn {
   position: absolute;
   bottom: 10px;
@@ -2050,7 +2107,7 @@ html {
 .item-card:hover {
   box-shadow: 0 10px 25px var(--orange);
   transform: scale(1.03);
-  border: solid 3px var(--orangeL);
+  border: solid 3px var(--orange);
   background: var(--light-orange);
 }
 .item-card:active {
@@ -3851,6 +3908,14 @@ html {
   .unavailable-overlay {
     font-size: 22px;
   }
+
+  .banner-rating {
+    position: absolute;
+    height: 30px;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+  }
 }
 
 @container (max-width: 730px) {
@@ -3900,10 +3965,18 @@ html {
 
   .items-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, auto));
-    justify-content: start;
+    grid-template-columns: repeat(auto-fit, minmax(180px, auto));
+    justify-content: center;
     gap: 16px;
     margin-top: 20px;
     margin-bottom: 50px;
+  }
+
+  .banner-rating {
+    position: absolute;
+    height: 30px;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
   }
 }

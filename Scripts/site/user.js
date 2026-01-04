@@ -98,6 +98,12 @@ function loadRestaurants() {
         <div class="restaurant-banner">
           <img class="item-image-bg1" src="${logo}">
           <img src="${banner}" alt="Banner" class="restaurant-banner-foreground">
+
+          <div class="resto-rating" id="restoRating">
+            <i class="star fa-solid fa-star"></i>
+            <span id="avg-${restoId}" class="resto-average-rating">0.0</span>
+          </div>
+
         </div>
         <div class="restaurant-logo-container">
           <img class="restaurant-logo" src="${logo}" alt="Logo">
@@ -109,6 +115,20 @@ function loadRestaurants() {
 
       div.onclick = () => openRestaurant(name, restoId, logo, banner);
       grid.appendChild(div);
+
+      // Resto Ratings
+      const avgLabel = div.querySelector(`#avg-${restoId}`);
+      const restoRef = doc(db, "users", restoId);
+
+      onSnapshot(restoRef, (docUpdate) => {
+        if (!docUpdate.exists()) return;
+        const data = docUpdate.data();
+        const rTotal = data.ratings?.total || 0;
+        const rCount = data.ratings?.count || 0;
+        const average = rCount ? (rTotal / rCount).toFixed(1) : "0.0";
+        
+        if (avgLabel) avgLabel.textContent = average;
+      });
 
       requestAnimationFrame(() => {
         div.style.transitionDelay = `${index * 60}ms`;
@@ -131,6 +151,93 @@ function loadRestaurants() {
 // Modal
 const modal = document.getElementById("resto-modal");
 
+async function setupRatingSystem(restoId) {
+  const user = auth.currentUser;
+  const ratingContainer = document.getElementById("bannerRating");
+  if (!ratingContainer) return;
+
+  const avgLabel = document.getElementById("averageRating");
+  const restoRef = doc(db, "users", restoId);
+
+  function updateStarIcons(val) {
+    const numericVal = Math.round(parseFloat(val));
+    const liveStars = ratingContainer.querySelectorAll(".star");
+    
+    liveStars.forEach(star => {
+      const starVal = parseInt(star.dataset.value);
+      if (starVal <= numericVal && numericVal > 0) {
+        // Switch to Solid Star
+        star.classList.remove("fa-regular");
+        star.classList.add("fa-solid", "filled");
+      } else {
+        // Switch to Regular Star
+        star.classList.remove("fa-solid", "filled");
+        star.classList.add("fa-regular");
+      }
+    });
+  }
+
+  // Initial Reset: Clear previous ghost stars immediately
+  updateStarIcons(0);
+  avgLabel.textContent = "0.0";
+
+  // Real-time listener for average rating
+  onSnapshot(restoRef, (snap) => {
+    if (!snap.exists()) return;
+    const data = snap.data();
+    const total = data.ratings?.total || 0;
+    const count = data.ratings?.count || 0;
+    const average = count ? (total / count).toFixed(1) : "0.0";
+    
+    avgLabel.textContent = average;
+    updateStarIcons(average);
+  });
+
+  // Setup interaction for logged-in users
+  if (user) {
+    const userRatingRef = doc(db, "users", restoId, "userRatings", user.uid);
+
+    // Initial check for current user's previous rating
+    const existingDoc = await getDoc(userRatingRef);
+    if (existingDoc.exists()) {
+      updateStarIcons(existingDoc.data().value);
+    }
+
+    // Attach click events
+    const stars = ratingContainer.querySelectorAll(".star");
+    stars.forEach(star => {
+      const newStar = star.cloneNode(true);
+      star.parentNode.replaceChild(newStar, star);
+
+      newStar.addEventListener("click", async () => {
+        const newVal = parseInt(newStar.dataset.value);
+        
+        try {
+          const ratingSnap = await getDoc(userRatingRef);
+          
+          if (ratingSnap.exists()) {
+            const oldVal = ratingSnap.data().value;
+            const diff = newVal - oldVal;
+            await updateDoc(restoRef, { "ratings.total": increment(diff) });
+            await updateDoc(userRatingRef, { value: newVal });
+          } else {
+            await updateDoc(restoRef, {
+              "ratings.total": increment(newVal),
+              "ratings.count": increment(1)
+            });
+            await setDoc(userRatingRef, { value: newVal, timestamp: new Date() });
+          }
+          
+          updateStarIcons(newVal);
+          if (typeof showNotif === "function") showNotif(`Rated ${newVal} stars!`);
+        } catch (err) {
+          console.error("Rating error:", err);
+          if (typeof showError === "function") showError("Failed to save rating.");
+        }
+      });
+    });
+  }
+}
 
 async function openRestaurant(name, restoId, logo, banner) {
   // Fetch resto document
@@ -154,6 +261,8 @@ async function openRestaurant(name, restoId, logo, banner) {
 
   document.getElementById("restoName1").textContent = restoData.username || "Unnamed Restaurant";
   document.getElementById("restoEmail").textContent = restoData.email || "No email";
+
+  setupRatingSystem(restoId);
 
   await loadRestaurantData(restoId);
 }
@@ -445,7 +554,7 @@ async function openRedeemModal(itemId) {
 
     const reservedCount = resSnap.size;
 
-    // ❌ Already fully reserved
+    // Already fully reserved
     if (reservedCount >= stock) {
       showError("This item is fully reserved. No stock left to redeem.");
       return;
