@@ -243,6 +243,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (localStorage.getItem("loggedInUserType") !== "restaurant") return window.location.href = "home-user.html";
 
     const docRef = doc(db, "users", user.uid);
+    const avgRestoLabel = document.getElementById("averageRestoRating");
 
     // Listen for real-time updates
     const unsubscribe = onSnapshot(docRef, (docSnap) => {
@@ -254,6 +255,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
       profileImg.src = data.profileBase64 || "Resources/assets/profile.jpg";
       bannerImg.src = data.bannerBase64 || "Resources/assets/banner.webp";
+
+      const ratings = data.ratings || { total: 0, count: 0 };
+      const total = ratings.total || 0;
+      const count = ratings.count || 0;
+      const average = count > 0 ? (total / count).toFixed(1) : "0.0";
+
+      if (avgRestoLabel) {
+        avgRestoLabel.textContent = average;
+      }
     });
   });
 

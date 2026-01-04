@@ -1914,6 +1914,23 @@ html {
   color: var(--ptext);
 }
 
+.resto-rating1 {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  gap: 2px;
+  font-size: 16px;
+  color: var(--orange);
+  cursor: pointer;
+  user-select: none;
+  z-index: 10;
+  background-color: var(--orangeL1);
+  border-radius: var(--radius-inner);
+  padding-left: 5px;
+  padding-right: 5px;
+  border: solid 3px var(--orangeL);
+}
+
 .resto-rating {
   position: absolute;
   top: 10px;
@@ -1937,7 +1954,7 @@ html {
   right: 10px;
   gap: 2px;
   font-size: 18px;
-  color: var(--orangeL);
+  color: var(--orange);
   cursor: pointer;
   user-select: none;
   z-index: 10;
@@ -1948,7 +1965,8 @@ html {
   border: solid 3px var(--orangeL);
 }
 
-.banner-rating:hover {
+.banner-rating:hover,
+.resto-rating1:hover {
   border: solid 3px var(--orange);
 }
 
@@ -1964,7 +1982,6 @@ html {
   margin-left: 5px;
   font-size: 1rem;
   font-weight: 600;
-  color: var(--orange);
 }
 
 .resto-average-rating {
