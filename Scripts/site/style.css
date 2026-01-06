@@ -17,6 +17,16 @@ body {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+img {
+  -webkit-user-drag: none; 
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-select: none;
+  -webkit-touch-callout: none; 
 }
 
 #cursorCircle {
@@ -694,6 +704,7 @@ body {
   flex-direction: column;
   cursor: auto;
   container-type: inline-size;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* About */
@@ -3888,7 +3899,7 @@ html {
 
   .modal-content {
     max-height: 75vh;
-    
+    -webkit-overflow-scrolling: touch;
   }
 
   .restaurant-grid {
