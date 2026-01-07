@@ -88,7 +88,7 @@ function playShakeSound() {
     }
 
     // 2. Initialize and play sound
-    shakeAudio = new Audio("Resources/assets/shaker.mp3");
+    shakeAudio = new Audio("Resources/sfx/shaker.mp3");
     shakeAudio.loop = true; // Loop so it doesn't end while shaking
     
     if (typeof safeVibrate === 'function') safeVibrate([100, 50, 100]);
