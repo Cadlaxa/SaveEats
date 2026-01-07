@@ -549,8 +549,9 @@ async function saveItem(e) {
         available,
         imageBase64: compressedBase64
       });
-
-      showNotif("Item updated successfully!");
+      setTimeout(() => {
+        showNotif("Item updated successfully!");
+      }, 50);
     } else {
       // TRUE ADD MODE
       await addDoc(collection(db, "items"), {
@@ -565,8 +566,9 @@ async function saveItem(e) {
         imageBase64: compressedBase64,
         createdAt: serverTimestamp()
       });
-
-      showNotif("Item added successfully!");
+      setTimeout(() => {
+        showNotif("Item added successfully!");
+      }, 50);
     }
 
     clearItemForm();

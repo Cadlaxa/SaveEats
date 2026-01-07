@@ -200,12 +200,19 @@ document.addEventListener('DOMContentLoaded', () => {
 // =======================
 function playRandomClickSound() {
     if (!audioEnabled || !firstInteractionOccurred || clickAudioPlayers.length === 0) return;
+    
     try {
         const randomIndex = Math.floor(Math.random() * clickAudioPlayers.length);
-        const audio = clickAudioPlayers[randomIndex];
-        audio.pause();
-        audio.currentTime = 0;
-        audio.play().catch(e => console.warn("Click SFX blocked:", e));
+        const originalAudio = clickAudioPlayers[randomIndex];
+        const soundClone = originalAudio.cloneNode();
+        soundClone.volume = originalAudio.volume;
+        soundClone.play().catch(e => {
+            console.warn("Click SFX blocked:", e.message);
+        });
+        soundClone.onended = () => {
+            soundClone.remove();
+        };
+
     } catch (e) {
         console.error("Error playing click sound:", e);
     }
