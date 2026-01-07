@@ -280,34 +280,39 @@ function createItemElement(id, item, index) {
       e.stopPropagation();
       openReservationModal(id);
     };
-
-    if (isInitialLoad) {
-      isInitialLoad = false; // Set to false after the very first data pull
-    } else {
-      // Only check docChanges after the initial load
-      for (const change of snap.docChanges()) {
-        if (change.type === "added") {
-          const reservation = change.doc.data();
-          
-          // Fetch user data for the notification
-          const userSnap = await getDoc(doc(db, "users", reservation.userId));
-          const userData = userSnap.exists() ? userSnap.data() : {};
-          const username = userData.username || "Someone";
-          const itemName = item.name || "an item";
-
-          if (Notification.permission === "granted") {
-            window.sendNotification("New Reservation 🥕", {
-              body: `${username} reserved ${itemName}`,
-              icon: "Resources/assets/icon1.png",
-              data: { url: "resto-dashboard.html" }
-            });
-          }
-        }
-      }
-    }
   });
   return div;
 }
+
+// Push Notification for new reservations
+onSnapshot(q, async (snap) => {
+  if (isInitialLoad) {
+      isInitialLoad = false;
+      return; 
+  }
+
+  for (const change of snap.docChanges()) {
+      if (change.type === "added") {
+          const reservation = change.doc.data();
+
+          // Fetch user data
+          const userSnap = await getDoc(doc(db, "users", reservation.userId));
+          const userData = userSnap.exists() ? userSnap.data() : {};
+          const username = userData.username || "Someone";
+          const itemName = item?.name || "an item";
+
+          // Check permission and send via service worker
+          if (Notification.permission === "granted") {
+              // Use the global function from your script.js
+              window.sendNotification("New Reservation 🥕", {
+                  body: `${username} reserved this item: ${itemName}`,
+                  icon: "Resources/assets/icon1.png",
+                  data: { url: "resto-dashboard.html" }
+              });
+          }
+      }
+  }
+});
 
 async function openReservationModal(itemId) {
   const modal = document.getElementById("reserved-modal");

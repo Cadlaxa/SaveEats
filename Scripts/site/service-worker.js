@@ -68,6 +68,33 @@ self.addEventListener('fetch', event => {
   );
 });
 
+// Listen for the Push event
+self.addEventListener('push', event => {
+    let data = { title: 'New Update', body: 'You have a new notification!', icon: 'Resources/assets/icon1.png' };
+
+    if (event.data) {
+        try {
+            data = event.data.json();
+        } catch (e) {
+            data.body = event.data.text();
+        }
+    }
+
+    const options = {
+        body: data.body,
+        icon: data.icon || 'Resources/assets/icon1.png',
+        badge: 'Resources/assets/icon1.png',
+        vibrate: [100, 50, 100],
+        data: {
+            url: data.url || '/'
+        }
+    };
+
+    event.waitUntil(
+        self.registration.showNotification(data.title, options)
+    );
+});
+
 self.addEventListener('notificationclick', event => {
   event.notification.close();
   const url = event.notification.data?.url || '/';
