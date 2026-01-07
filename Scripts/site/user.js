@@ -21,7 +21,12 @@ function checkSecondaryPermissions() {
   const message = modal.querySelector(".notif-message");
 
   message.textContent = "Enable notifications and motion effects for the best SaveEats experience 🥕";
+  if (Notification.permission === 'granted') {
+    if (typeof initShakeDetection === 'function') initShakeDetection();
+    return;
+  }
 
+  if (Notification.permission === 'denied') return;
   if (
     'Notification' in window &&
     Notification.permission === 'default' &&
@@ -30,41 +35,29 @@ function checkSecondaryPermissions() {
     window.modalManager.open(modal);
 
     yesBtn.onclick = async () => {
-      window.modalManager.close();
-
-      // 2. Handle Motion Permission (Critical for Shake SFX)
+      const granted = await window.requestNotificationPermission();
+      
+      // 2. Handle Motion Permission
       if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
-        try {
-          const permissionState = await DeviceMotionEvent.requestPermission();
-          if (permissionState === 'granted') {
-            console.log("Motion sensors enabled");
-            // Initialize your shake detection if it's not already running
-            if (typeof initShakeDetection === 'function') initShakeDetection();
-          }
-        } catch (error) {
-          console.error("Motion permission request failed:", error);
-        }
-      } else {
-        // Non-iOS devices usually don't require explicit permission
-        if (typeof initShakeDetection === 'function') initShakeDetection();
+          try {
+              await DeviceMotionEvent.requestPermission();
+          } catch (e) { console.warn(e); }
       }
 
-      // 3. Handle Notification Permission
-      const granted = await window.requestNotificationPermission();
+      // 3. Now perform the cleanup tasks
       localStorage.setItem('notifChoice', 'asked');
+      window.modalManager.close(); // Visual cleanup
 
       if (granted) {
           if (typeof window.sendNotification === 'function') {
               window.sendNotification('Welcome! 🥕', {
                   body: 'Notifications and motion effects enabled.',
                   icon: 'Resources/assets/icon1.png',
-                  badge: 'Resources/assets/icon1.png', 
-                  vibrate: [100, 50, 100], 
-                  data: {
-                      url: 'home-user.html' 
-                  }
+                  data: { url: 'home-user.html' }
               });
           }
+          // Initialize sensors if granted
+          if (typeof initShakeDetection === 'function') initShakeDetection(); 
       }
     };
 
