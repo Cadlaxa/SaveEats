@@ -341,7 +341,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* ---------------- FORGOT PASSWORD ---------------- */
-window.handleForgotPassword = async function(btn) {
+  window.handleForgotPassword = async function(btn) {
     const email = document.getElementById("login-email").value.trim();
     if (!email) return showError("Please enter your email first.");
 
@@ -352,10 +352,10 @@ window.handleForgotPassword = async function(btn) {
     if(spinner) spinner.style.display = 'inline-block';
 
     try {
+        showNotif("Reset link sent! Please check your inbox, including spam/junk folder.");
         await sendPasswordResetEmail(auth, email);
-        showNotif("Reset link sent! Please check your inbox.");
     } catch (err) {
-        showError(err);
+        console.error("Reset Error:", err);
         let msg = "Failed to send reset email.";
         if (err.code === "auth/user-not-found") msg = "No account found with this email.";
         if (err.code === "auth/invalid-email") msg = "Invalid email format.";
@@ -368,4 +368,5 @@ window.handleForgotPassword = async function(btn) {
         if(spinner) spinner.style.display = 'none';
     }
   };
+
 });
