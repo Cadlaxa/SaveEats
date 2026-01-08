@@ -298,7 +298,12 @@
                 <button type="button" id="profileSelectBtn" class="submit-btn1">
                   <i class="fa-solid fa-image"></i> Change Profile Photo
                 </button>
-                <button class="submit-btn" id="saveProfileImage">Save</button>
+
+                <button type="button" class="submit-btn" id="saveProfileBtn" 
+                        onclick="handleActionClick(this, () => saveProfileProcess())">
+                    <span class="btn-text">Save</span>
+                    <i class="fa-solid fa-spinner fa-spin btn-spinner" style="display: none;"></i>
+                </button>
 
               </div>
 
@@ -329,7 +334,12 @@
                 <button type="button" id="bannerSelectBtn" class="submit-btn1">
                   <i class="fa-solid fa-image"></i> Change Banner Photo
                 </button>
-                <button class="submit-btn" id="saveBannerImage">Save</button>
+
+                <button type="button" class="submit-btn" id="saveBannerImage" 
+                        onclick="handleActionClick(this, () => saveBannerProcess())">
+                    <span class="btn-text">Save</span>
+                    <i class="fa-solid fa-spinner fa-spin btn-spinner" style="display: none;"></i>
+                </button>
               </div>
 
           </div>
@@ -356,9 +366,17 @@
               <img id="itemPreviewImage" src="Resources/assets/food.png" class="item-preview-img">
               <input type="file" id="itemImageInput" accept="image/*" hidden>
 
-              <button type="button" id="itemImgSelectBtn" class="submit-btn1">
-                <i class="fa-solid fa-image"></i> Change Item Photo
-              </button>
+              <div class="form-grid4">
+                <button type="button" id="itemImgSelectBtn" class="submit-btn1">
+                  <i class="fa-solid fa-image"></i> Choose from File
+                </button>
+
+                <button type="button" id="PasteImgBtn" class="submit-btn1 action-btn" 
+                        onclick="handleActionClick(this, () => PasteImageFromClipboard())">
+                    <span class="btn-text"><i class="fa-solid fa-image"></i> Paste from Clipboard</span>
+                    <i class="fa-solid fa-spinner fa-spin btn-spinner" style="display: none;"></i>
+                </button>
+              </div>
             </div>
 
             <!-- ITEM NAME -->

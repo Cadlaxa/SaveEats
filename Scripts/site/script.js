@@ -55,8 +55,15 @@ document.addEventListener('DOMContentLoaded', () => {
     let highestZIndex = 1000;
     let activeModal = null;
 
-    document.addEventListener('contextmenu', function (event) {
-        // Prevent the context menu from appearing
+   document.addEventListener('contextmenu', function (event) {
+        const allowedTags = ['TEXTAREA'];
+
+        const isInsideForm = event.target.closest('form');
+        const isAllowedTag = allowedTags.includes(event.target.tagName);
+
+        if (isAllowedTag || isInsideForm) {
+            return;
+        }
         event.preventDefault();
     });
 
@@ -574,5 +581,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startY = currentY = 0;
     }
+
+    // GLOBAL BUTTON ACTION SPINNER
+    window.handleActionClick = async function(btn, actionFn) {
+      const spinner = btn.querySelector('.btn-spinner');
+      
+      // 1. Enter Loading State
+      btn.disabled = true;
+      if (spinner) spinner.style.display = 'inline-block';
+    
+      try {
+        // 2. Execute the passed function and WAIT for it
+        await actionFn(); 
+      } catch (err) {
+        console.error("Action failed:", err);
+        setTimeout(() => {
+          if (typeof showError === "function") showError(err.message || err);
+        }, 100);
+      } finally {
+        btn.disabled = false;
+        if (spinner) spinner.style.display = 'none';
+      }
+    };
 
 });

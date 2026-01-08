@@ -350,8 +350,17 @@
             <!-- BUTTON -->
             <div class="bg-container">
               <div class="form-grid1">
-                <button type="button" class="submit-btn" id="reserveItemBtn">Reserve Item</button>
-                <button type="button" class="submit-btn" id="redeemItemBtn">Redeem Item</button>
+                <button type="button" class="submit-btn" id="reserveItemBtn" 
+                        onclick="handleActionClick(this, () => reserveCurrentItem())">
+                    <span class="btn-text">Reserve Item</span>
+                    <i class="fa-solid fa-spinner fa-spin btn-spinner" style="display: none;"></i>
+                </button>
+
+                <button type="button" class="submit-btn" id="redeemItemBtn" 
+                        onclick="handleActionClick(this, () => redeemCurrentItem())">
+                    <span class="btn-text">Redeem Item</span>
+                    <i class="fa-solid fa-spinner fa-spin btn-spinner" style="display: none;"></i>
+                </button>
               </div>
             </div>
 
@@ -387,7 +396,11 @@
                   <i class="fa-solid fa-image"></i> Change Profile Photo
                 </button>
 
-                <button class="submit-btn" id="saveProfileImage">Save</button>
+                <button type="button" class="submit-btn" id="saveProfileImage" 
+                        onclick="handleActionClick(this, () => saveUserProfile())">
+                    <span class="btn-text">Save</span>
+                    <i class="fa-solid fa-spinner fa-spin btn-spinner" style="display: none;"></i>
+                </button>
 
               </div>
 

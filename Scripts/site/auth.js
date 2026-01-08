@@ -108,27 +108,35 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ---------------- AUTH STATE ---------------- */
 
   onAuthStateChanged(auth, async (user) => {
-    if (!user) return;
+    if (!user) {
+      // Optional: If on a protected page, send to login
+      return;
+    }
 
+    // Prevent redirect loops: only redirect if we are on index/signup
     if (!isAuthPage()) return;
 
-    // Try cached type first
-    let type = localStorage.getItem("loggedInUserType");
-
     try {
+      // 1. Check local cache first for speed
+      let type = localStorage.getItem("loggedInUserType");
+
+      // 2. If no cache, fetch from Firestore
       if (!type) {
         const snap = await getDoc(doc(db, "users", user.uid));
-        type = snap.exists() ? snap.data().type : "user";
-        localStorage.setItem("loggedInUserType", type);
+        if (snap.exists()) {
+          type = snap.data().type;
+          localStorage.setItem("loggedInUserType", type);
+        } else {
+          type = "user";
+        }
       }
 
-      window.location.href =
-        type === "restaurant"
-          ? "resto-dashboard.html"
-          : "home-user.html";
+      window.location.replace(
+        type === "restaurant" ? "resto-dashboard.html" : "home-user.html"
+      );
 
     } catch (err) {
-      showError(err.message);
+      console.error("Redirect check failed:", err);
     }
   });
 
@@ -180,37 +188,30 @@ document.addEventListener("DOMContentLoaded", () => {
     const provider = new GoogleAuthProvider();
 
     try {
+      // Safari on iOS hates popups; Force redirect to avoid Session Storage errors
       if (isIOS()) {
+        // Optional: Save a hint to localStorage that we are expecting a redirect login
+        localStorage.setItem("pendingLogin", "true");
         await signInWithRedirect(auth, provider);
-        return;
+        return; 
       }
 
       const result = await signInWithPopup(auth, provider);
-      const email = result.user.email;
-
-      const methods = await checkEmailExists(email);
-
-      if (
-        methods.length &&
-        !methods.includes("google.com")
-      ) {
-        await auth.signOut();
-        return showError(
-          "This email is already registered using " +
-          methods[0].replace(".com", "")
-        );
-      }
-
-      await writeOrUpdateUserProfile(result.user);
-      localStorage.setItem(
-        "loggedInUserType",
-        snap.exists() ? snap.data().type : "user"
-      );
+      await handleLoginPostProcess(result.user);
 
     } catch (err) {
-      showError(err.message);
+      showError("Google Sign-In failed: " + err.message);
     }
   });
+
+  // Helper to handle Firestore logic after any login type
+  async function handleLoginPostProcess(user) {
+    const snap = await getDoc(doc(db, "users", user.uid));
+    const type = snap.exists() ? snap.data().type : "user";
+    
+    localStorage.setItem("loggedInUserType", type);
+    await writeOrUpdateUserProfile(user);
+  }
 
   /* ---------------- APPLE LOGIN ---------------- */
   appleLoginBtn?.addEventListener("click", async (e) => {

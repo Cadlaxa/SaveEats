@@ -204,8 +204,12 @@ function createItemElement(id, item, index) {
     </div>
 
     <div class="item-actions">
-      <button onclick="editItem('${id}')">Edit</button>
-      <button onclick="deleteItem('${id}')">Delete</button>
+      <button onclick="handleEditClick(this, '${id}')">Edit
+        <i class="fa-solid fa-spinner fa-spin btn-spinner" style="display: none;"></i>
+      </button>
+      <button onclick="handleDelClick(this, '${id}')">Delete
+        <i class="fa-solid fa-spinner fa-spin btn-spinner" style="display: none;"></i>
+      </button>
     </div>
   `;
 
@@ -420,6 +424,42 @@ function toLocalInputValue(date) {
 
 let originalExpiry = null;
 
+window.handleEditClick = async function(btn, id) {
+  const spinner = btn.querySelector('.btn-spinner');
+  
+  btn.disabled = true;
+  spinner.style.display = 'inline-block';
+
+  try {
+      await window.editItem(id); 
+  } catch (err) {
+    setTimeout(() => {
+      showError(err);
+    }, 100);
+  } finally {
+      btn.disabled = false;
+      spinner.style.display = 'none';
+  }
+}
+
+window.handleDelClick = async function(btn, id) {
+  const spinner = btn.querySelector('.btn-spinner');
+  
+  btn.disabled = true;
+  spinner.style.display = 'inline-block';
+
+  try {
+      await window.deleteItem(id); 
+  } catch (err) {
+    setTimeout(() => {
+      showError(err);
+    }, 100);
+  } finally {
+      btn.disabled = false;
+      spinner.style.display = 'none';
+  }
+}
+
 window.editItem = async function(id) {
   try {
     const docSnap = await getDoc(doc(db, "items", id));
@@ -476,6 +516,61 @@ window.editItem = async function(id) {
   }
 }
 
+window.PasteImageFromClipboard = async function() {
+  try {
+    const items = await navigator.clipboard.read();
+    
+    for (const item of items) {
+      const imageTypes = item.types.filter(type => type.startsWith('image/'));
+      
+      if (imageTypes.length > 0) {
+        const blob = await item.getType(imageTypes[0]);
+        const reader = new FileReader();
+
+        await new Promise((resolve, reject) => {
+          reader.onload = (e) => {
+              const img = new Image();
+              img.onload = () => {
+                  // 1. Prepare 300x300 canvas for high-quality compression
+                  const canvas = document.createElement("canvas");
+                  canvas.width = 300;
+                  canvas.height = 300;
+                  const ctx = canvas.getContext("2d");
+
+                  const minSide = Math.min(img.width, img.height);
+                  const sx = (img.width - minSide) / 2;
+                  const sy = (img.height - minSide) / 2;
+
+                  ctx.drawImage(
+                      img,
+                      sx, sy, minSide, minSide, 
+                      0, 0, 300, 300
+                  );
+
+                  const compressedBase64 = canvas.toDataURL("image/jpeg", 0.9);
+                  
+                  if (typeof itemPreviewImage !== 'undefined') itemPreviewImage.src = compressedBase64;
+                  if (typeof selectedItemImage !== 'undefined') selectedItemImage.src = compressedBase64;
+                  resolve(); 
+              };
+              img.onerror = () => reject(new Error("Failed to load image from clipboard."));
+              img.src = e.target.result;
+          };
+          reader.onerror = () => reject(new Error("Failed to read clipboard data."));
+          reader.readAsDataURL(blob);
+      });
+        
+        return;
+      }
+    }
+    throw new Error("No image found in clipboard."); 
+    
+  } catch (err) {
+    console.error("Paste failed:", err);
+    throw err; 
+  }
+};
+
 // -------------------------------
 // SAVE ITEM
 // -------------------------------
@@ -524,7 +619,7 @@ async function saveItem(e) {
   // Basic validation
   if (!name || !selectedItemImage.src || !originalPrice || !discountedPrice || !quantity || ! minSellingPrice)  {
     isSaving = false;
-    return alert("Please fill all required fields");
+    return showNotif("Please fill all required fields");
   }
 
   // Prepare compressed image
@@ -617,6 +712,7 @@ function clearItemForm() {
   itemDescription.value = "";
   itemOriginalPrice.value = "";
   itemDiscountedPrice.value = "";
+  itemMinSellingPrice.value = "";
   itemQuantity.value = "";
   itemExpiry.value = "";
   selectedItemImage.src = "";

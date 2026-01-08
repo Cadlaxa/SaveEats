@@ -10,7 +10,7 @@ import {
   doc,
   updateDoc,
   increment,
-  deleteDoc
+  deleteDoc,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 function checkSecondaryPermissions() {
@@ -565,7 +565,7 @@ function updateOpenItemModal(item) {
     document.getElementById("itemExpiry").value = expireISO || "";
 }
 
-document.getElementById("redeemItemBtn").addEventListener("click", () => {
+window.redeemCurrentItem = (async () => {
   if (!window.currentItem) return;
 
   const canvas = document.getElementById("qrCanvas");
@@ -935,7 +935,7 @@ profileInput.addEventListener("change", (e) => {
     reader.readAsDataURL(file);
 });
 
-document.getElementById("saveProfileImage").addEventListener("click", async () => {
+window.saveUserProfile = (async () => {
   const user = auth.currentUser;
   if (!user) return showError("Not logged in");
 
@@ -1254,7 +1254,7 @@ function listenReservedItems(userId) {
   });
 }
 
-document.getElementById("reserveItemBtn").addEventListener("click", async () => {
+window.reserveCurrentItem = (async () => {
   const item = window.currentItem;
   const user = auth.currentUser;
 

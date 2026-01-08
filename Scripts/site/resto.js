@@ -358,7 +358,7 @@ document.addEventListener("DOMContentLoaded", () => {
     img.src = data.bannerBase64;
   }
 
-  saveProfileBtn.addEventListener("click", async () => {
+  window.saveProfileProcess = async function() {
     const user = auth.currentUser;
     if (!user) return showError("Not logged in");
 
@@ -387,7 +387,7 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error(err);
       showError("Failed to save profile: " + err.message);
     }
-  });
+  };
 
   // -------------------------------
   // BANNER IMAGE SELECT & CROP
@@ -425,7 +425,7 @@ document.addEventListener("DOMContentLoaded", () => {
     bannerCtx.drawImage(selectedBannerImage, startX, startY, cropWidth, cropHeight, 0, 0, bannerCropSize.width, bannerCropSize.height);
   }
 
-  saveBannerBtn.addEventListener("click", async () => {
+  window.saveBannerProcess = async function() {
     const user = auth.currentUser;
     if (!user) return alert("Not logged in");
     if (!selectedBannerImage.src) return showError("No image selected");
@@ -441,7 +441,7 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (err) {
       showError("Update failed: " + err.message);
     }
-  });
+  };
 
   async function handleQrScan(data) {
     try {

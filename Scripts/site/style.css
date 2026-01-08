@@ -1522,6 +1522,13 @@ html {
   margin-bottom: 20px;
 }
 
+.form-grid4 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 12px;
+}
+
 .form-grid3 label {
   font-size: 16px;
   font-weight: 600;
@@ -1535,7 +1542,9 @@ html {
 .form-grid2 input,
 .form-grid2 textarea,
 .form-grid3 input,
-.form-grid3 textarea {
+.form-grid3 textarea,
+.form-grid4 input,
+.form-grid4 textarea {
   background-color: var(--orangeHL);
   border: 3px solid var(--orangeL1);
   border-radius: var(--radius-inner);
@@ -1548,16 +1557,18 @@ html {
   transition: all 0.2S ease-in-out;
 }
 
-.form-grid input:active,
+/*.form-grid input:active,
 .form-grid textarea:active,
 .form-grid1 input:active,
 .form-grid1 textarea:active
 .form-grid2 input:active,
 .form-grid2 textarea:active,
 .form-grid3 input:active,
-.form-grid3 textarea:active {
+.form-grid3 textarea:active,
+.form-grid4 input:active,
+.form-grid4 textarea:active {
   transform: var(--clicky);
-}
+}*/
 
 .form-grid input:focus,
 .form-grid textarea:focus,
@@ -1566,7 +1577,9 @@ html {
 .form-grid2 input:focus,
 .form-grid2 textarea:focus,
 .form-grid3 input:focus,
-.form-grid3 textarea:focus{
+.form-grid3 textarea:focus, 
+.form-grid4 input:focus,
+.form-grid4 textarea:focus {
   border-color: var(--orange);
   background-color: var(--orangeL1);
 }
@@ -1578,7 +1591,9 @@ html {
 .form-grid2 input:hover,
 .form-grid2 textarea:hover,
 .form-grid3 input:hover,
-.form-grid3 textarea:hover{
+.form-grid3 textarea:hover, 
+.form-grid4 input:hover,
+.form-grid4 textarea:hover {
   border-color: var(--orange);
 }
 
@@ -1586,7 +1601,8 @@ html {
 .form-grid textarea,
 .form-grid1 textarea,
 .form-grid2 textarea,
-.form-grid3 textarea {
+.form-grid3 textarea, 
+.form-grid4 textarea {
   grid-column: span 2;
   min-height: 80px;
 }
