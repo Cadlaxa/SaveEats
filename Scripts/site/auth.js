@@ -35,6 +35,24 @@ document.addEventListener("DOMContentLoaded", () => {
   const isIOS = () =>
     /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
+  const isIphone = () =>
+    /iPhone/.test(navigator.userAgent) && !window.MSStream;
+
+  const handleIPhoneUI = () => {
+      const googleBtn = document.getElementById("googleLoginBtn");
+      if (!googleBtn) return;
+      const isIPhone = /iPhone/.test(navigator.userAgent);
+
+      if (isIPhone) {
+          googleBtn.style.display = "none";
+      } else {
+          googleBtn.style.display = "display"; 
+      }
+  };
+
+  handleIPhoneUI();
+  window.addEventListener("resize", handleIPhoneUI);
+
   /* ---------------- ELEMENTS ---------------- */
 
   const loginForm = document.getElementById("loginForm");
