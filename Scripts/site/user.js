@@ -11,6 +11,7 @@ import {
   updateDoc,
   increment,
   deleteDoc,
+  runTransaction
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 function checkSecondaryPermissions() {
@@ -767,7 +768,9 @@ function listenReservedRedemptions(reservationId, itemId) {
     // If redeemed → delete reservation + decrease stock
     if (data.redeemed === true) {
       try {
-        await runTransaction(db, async (transaction) => {
+        // resto only can update not users
+        
+        /*await runTransaction(db, async (transaction) => {
           // 1. Decrease item qty
           transaction.update(itemRef, {
             quantity: increment(-1)
@@ -775,7 +778,7 @@ function listenReservedRedemptions(reservationId, itemId) {
 
           // 2. Delete reservation doc
           transaction.delete(reservationRef);
-        });
+        });*/
 
         closeRedeemModalWithFX();
       } catch (err) {
