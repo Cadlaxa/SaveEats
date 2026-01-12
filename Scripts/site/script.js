@@ -479,49 +479,55 @@ document.addEventListener('DOMContentLoaded', () => {
     // GLOBAL MODAL BACK-BUTTON MANAGER
     window.modalManager = {
         stack: [],
-        // Cache common elements to avoid repeat DOM queries
         zoomedImg: null,
+        isProcessing: false, // Prevents "back-to-back" execution conflicts
 
         open(elements) {
             if (!Array.isArray(elements)) elements = [elements];
+            
+            // Push to stack first
+            this.stack.push(elements);
+            history.pushState({ modalLevel: this.stack.length }, "");
 
-            // 50ms delay before showing the elements
             setTimeout(() => {
                 requestAnimationFrame(() => {
                     elements.forEach(el => el.classList.add("visible"));
                 });
-            }, 50);
-
-            this.stack.push(elements);
-            history.pushState({ modalLevel: this.stack.length }, "");
+            }, 100);
         },
 
         close() {
-            if (this.stack.length > 0) {
+            // Only trigger back if there is something in the stack
+            if (this.stack.length > 0 && !this.isProcessing) {
                 history.back();
             }
         },
 
         handlePop() {
-            const topGroup = this.stack.pop();
-            if (!topGroup) return;
+            if (this.isProcessing) return;
+            this.isProcessing = true;
 
-            // 50ms delay before hiding the elements
+            const topGroup = this.stack.pop();
+            if (!topGroup) {
+                this.isProcessing = false;
+                return;
+            }
+
             setTimeout(() => {
                 requestAnimationFrame(() => {
                     topGroup.forEach(el => el.classList.remove("visible"));
                     
-                    // Check for zoomed image reset using cached reference if possible
                     this.zoomedImg = this.zoomedImg || document.getElementById("zoomedImage");
-                    
                     if (this.zoomedImg && topGroup.some(el => el.contains(this.zoomedImg) || el === this.zoomedImg)) {
                         this.zoomedImg.classList.remove("is-zoomed");
                         if (typeof window.resetImage === "function") window.resetImage();
                     }
+                    
+                    // Allow next close operation after animation starts
+                    this.isProcessing = false;
                 });
-            }, 50);
+            }, 100);
 
-            // Trigger vibration immediately as it's not tied to layout
             if (typeof safeVibrate === "function") safeVibrate([40]);
         }
     };
