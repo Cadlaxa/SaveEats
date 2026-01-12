@@ -484,9 +484,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         open(elements) {
             if (!Array.isArray(elements)) elements = [elements];
-            requestAnimationFrame(() => {
-                elements.forEach(el => el.classList.add("visible"));
-            });
+
+            // 50ms delay before showing the elements
+            setTimeout(() => {
+                requestAnimationFrame(() => {
+                    elements.forEach(el => el.classList.add("visible"));
+                });
+            }, 50);
 
             this.stack.push(elements);
             history.pushState({ modalLevel: this.stack.length }, "");
@@ -502,27 +506,28 @@ document.addEventListener('DOMContentLoaded', () => {
             const topGroup = this.stack.pop();
             if (!topGroup) return;
 
-            // Efficiently manage the reset of specific UI states
-            requestAnimationFrame(() => {
-                topGroup.forEach(el => el.classList.remove("visible"));
-                
-                // Check for zoomed image reset using cached reference if possible
-                this.zoomedImg = this.zoomedImg || document.getElementById("zoomedImage");
-                
-                if (this.zoomedImg && topGroup.some(el => el.contains(this.zoomedImg) || el === this.zoomedImg)) {
-                    this.zoomedImg.classList.remove("is-zoomed");
-                    if (typeof window.resetImage === "function") window.resetImage();
-                }
-            });
+            // 50ms delay before hiding the elements
+            setTimeout(() => {
+                requestAnimationFrame(() => {
+                    topGroup.forEach(el => el.classList.remove("visible"));
+                    
+                    // Check for zoomed image reset using cached reference if possible
+                    this.zoomedImg = this.zoomedImg || document.getElementById("zoomedImage");
+                    
+                    if (this.zoomedImg && topGroup.some(el => el.contains(this.zoomedImg) || el === this.zoomedImg)) {
+                        this.zoomedImg.classList.remove("is-zoomed");
+                        if (typeof window.resetImage === "function") window.resetImage();
+                    }
+                });
+            }, 50);
 
             // Trigger vibration immediately as it's not tied to layout
             if (typeof safeVibrate === "function") safeVibrate([40]);
         }
     };
 
-    window.addEventListener("popstate", (event) => {
-        window.modalManager.handlePop();
-    });
+    // Ensure you have an event listener to trigger handlePop
+    window.addEventListener('popstate', () => window.modalManager.handlePop());
 
     let startY = 0;
     let currentY = 0;
