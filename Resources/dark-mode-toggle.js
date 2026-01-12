@@ -83,3 +83,18 @@ prefersDark.addEventListener("change", (e) => {
         toggleDarkMode(e.matches ? "on" : "off", false, true);
     }
 });
+
+window.addEventListener("DOMContentLoaded", () => {
+    // Configure Dark Reader globally once
+    DarkReader.setFetchMethod(window.fetch);
+
+    const cookieMode = getCookie("darkmode");
+    const systemDark = prefersDark.matches;
+
+    if (cookieMode === "on" || (cookieMode === "" && systemDark)) {
+        // Force the theme immediately
+        toggleDarkMode("on", false, false);
+    } else {
+        toggleDarkMode("off", false, false);
+    }
+});
