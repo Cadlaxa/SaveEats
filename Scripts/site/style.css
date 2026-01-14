@@ -3924,15 +3924,16 @@ html {
   }
 
   .items-filter {
-    position: static;   /* remove absolute positioning */
-    margin-top: 10px;
     width: 100%;
     display: flex;
-    justify-content: center;
-    gap: 10px;
-    transform: scaleX(0.9);
     flex-direction: column;
-    flex: 1;
+    align-items: stretch;
+    margin-bottom: -45px;
+    padding: 0;
+    }
+
+  .search-input {
+    width: auto;
   }
 
   .items-filter label {
@@ -3945,6 +3946,7 @@ html {
 
   .sort {
     width: auto;
+    height: auto;
   }
 
   .home-hero {
