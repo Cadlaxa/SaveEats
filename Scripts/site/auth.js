@@ -107,7 +107,8 @@ document.addEventListener("DOMContentLoaded", () => {
       email: user.email,
       username: user.displayName || snap.data()?.username || "",
       profileImage: user.photoURL || snap.data()?.profileImage || "",
-      type: snap.data()?.type || "user"
+      type: snap.data()?.type || "user",
+      createdAt: snap.exists() ? snap.data().createdAt : new Date()
     }, { merge: true });
   };
 
@@ -215,6 +216,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const result = await signInWithPopup(auth, provider);
       await handleLoginPostProcess(result.user);
+      
 
     } catch (err) {
       showError("Google Sign-In failed: " + err.message);
@@ -223,10 +225,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Helper to handle Firestore logic after any login type
   async function handleLoginPostProcess(user) {
-    const snap = await getDoc(doc(db, "users", user.uid));
+    const ref = doc(db, "users", user.uid);
+    const snap = await getDoc(ref);
+
     const type = snap.exists() ? snap.data().type : "user";
-    
     localStorage.setItem("loggedInUserType", type);
+
     await writeOrUpdateUserProfile(user);
   }
 
@@ -283,7 +287,8 @@ document.addEventListener("DOMContentLoaded", () => {
       await setDoc(doc(db, "users", cred.user.uid), {
         email,
         username,
-        type: "user"
+        type: "user",
+        createdAt: snap.exists() ? snap.data().createdAt : new Date()
       });
 
     localStorage.setItem("loggedInUserType", "user");
@@ -314,7 +319,8 @@ document.addEventListener("DOMContentLoaded", () => {
       await setDoc(doc(db, "users", cred.user.uid), {
         email,
         username: name,
-        type: "restaurant"
+        type: "restaurant",
+        createdAt: snap.exists() ? snap.data().createdAt : new Date()
       });
 
       localStorage.setItem("loggedInUserType", "restaurant");
